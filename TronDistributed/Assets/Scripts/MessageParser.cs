@@ -6,6 +6,7 @@ public class MessageParser {
 
 	private PlayerManager playerManager;
 	private MotorController motorController;
+	private NetworkManager networkManager;
 
 	private string JOIN_USER = "join_game"; // this type of message is only received by the ui of super node
 	private string UPDATE_USER = "update";
@@ -16,9 +17,11 @@ public class MessageParser {
 	private string RESUME = "resume_game";
 	private string GAME_OVER = "game_over";
 	
-	public MessageParser(MotorController gameMotorController, PlayerManager gamePlayerManager) {
+	public MessageParser(MotorController gameMotorController, PlayerManager gamePlayerManager, 
+	                     NetworkManager gameNetworkManager) {
 		motorController = gameMotorController;
 		playerManager = gamePlayerManager;
+		networkManager = gameNetworkManager;
 	}
 	
 	public void ParseMessage(Message message) {
@@ -47,7 +50,38 @@ public class MessageParser {
 		
 	private void HandleJoinMessage(Message message) {
 		Debug.Log("HandleAddUserMessage");
-		//playerManager.AddNewPlayer(message.getUserID(), message.getPosition(); message.get
+
+		// Generate the initial position and direction
+		Vector3 startPos = new Vector3(Random.Range(1.0f, 63.0f), 1, Random.Range(1.0f, 63.0f));
+		float h, v;
+		float tmp = Random.Range(0.0f, 300.0f);
+		if (0.0f <= tmp && tmp < 100.0f) {
+			h = -1.0f;
+		} else if (100.0f <= tmp && tmp < 200.0f) {
+			h = 0.0f;
+		} else {
+			h = 1.0f;
+		}
+		if (h != 0.0f) {
+			v = 0.0f;
+		} else {
+			tmp = Random.Range(0.0f, 200.0f);
+			if (0.0f <= tmp && tmp < 100.0f) {
+				v = -1.0f;
+			} else {
+				v = 1.0f;
+			}
+		}
+
+		// Generate response message
+		Message responseMessage = new Message();
+		responseMessage.setUserName(message.getUserID());
+		responseMessage.setType("JOIN_USER_RESPONSE");
+		responseMessage.setPosition(startPos);
+		responseMessage.setHorizontalDir (h);
+		responseMessage.setVerticalDir (v);
+
+		networkManager.writeSocket (responseMessage.toJsonString ());
 	}
 		
 	private void HandleUpdateUserMessage(Message message) {

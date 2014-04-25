@@ -103,7 +103,7 @@ public class MotorController : MonoBehaviour {
 			return ;
 		}
 		Debug.Log("Get playerManager");
-		messageParser = new MessageParser(this, playerManager);
+		messageParser = new MessageParser(this, playerManager, networkManager);
 
 		Message msg = new Message ();
 		msg.setType("testing");
