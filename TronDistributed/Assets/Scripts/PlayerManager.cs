@@ -22,7 +22,7 @@ public class PlayerManager : MonoBehaviour{
 			return ;
 		}
 
-		Debug.Log ("Update all players locally");
+		//Debug.Log ("Update all players locally");
 		foreach (KeyValuePair<string, Player> pair in remotePlayers) {
 			pair.Value.UpdateLocally(Time.fixedTime);
 		}

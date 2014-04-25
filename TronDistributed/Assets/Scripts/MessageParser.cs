@@ -18,12 +18,31 @@ public class MessageParser : MonoBehaviour {
 	public static string RESUME = "resume_game";
 	public static string GAME_OVER = "game_over";
 	
+	void start() {
+		motorController = gameObject.GetComponent<MotorController>();
+		playerManager = gameObject.GetComponent<PlayerManager>();
+		networkManager = gameObject.GetComponent<NetworkManager>();
+
+		if (motorController == null) {
+			Debug.Log("cannot find motor controller");
+		}
+
+		if (playerManager == null) {
+			Debug.Log("cannot find player manager");
+		}
+
+		if (networkManager == null) {
+			Debug.Log("cannot find network manager");
+		}
+	}
+
+	/*
 	public MessageParser(MotorController gameMotorController, PlayerManager gamePlayerManager, 
 	                     NetworkManager gameNetworkManager) {
 		motorController = gameMotorController;
 		playerManager = gamePlayerManager;
 		networkManager = gameNetworkManager;
-	}
+	}*/
 
 	void Update() {
 		// Receive incoming message

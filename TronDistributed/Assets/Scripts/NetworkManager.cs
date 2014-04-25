@@ -18,7 +18,7 @@ public class NetworkManager : MonoBehaviour {
 
 	// Fields
 	internal bool mSocketReady = false;
-	private string mIpAddr = "128.237.212.211";
+	private string mIpAddr = "128.237.217.116";
 	private int mPort = 9999;
 	private string mUserID = "";
 	private TcpClient mClientSocket;
@@ -87,6 +87,15 @@ public class NetworkManager : MonoBehaviour {
 	void Start() 
 	{
 		// Dummy function
+		IPHostEntry host;
+		host = Dns.GetHostEntry (Dns.GetHostName ());
+		foreach (IPAddress ip in host.AddressList) {
+			if (ip.AddressFamily == AddressFamily.InterNetwork) {
+				mIpAddr = ip.ToString();
+				break;
+			}
+		}
+
 		// May there are other stuffs that need to be initialized?
 		mUserID = mIpAddr + ":" + mPort.ToString();
 	}

@@ -105,7 +105,8 @@ public class MotorController : MonoBehaviour {
 			return ;
 		}
 		Debug.Log("Get playerManager");
-		messageParser = new MessageParser(this, playerManager, networkManager);
+		messageParser = gameObject.GetComponent<MessageParser>();
+
 
 		Message msg = new Message ();
 		msg.setType(MessageParser.JOIN_USER);
