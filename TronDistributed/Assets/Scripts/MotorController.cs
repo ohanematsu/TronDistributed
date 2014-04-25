@@ -100,6 +100,8 @@ public class MotorController : MonoBehaviour {
 
 	private NetworkManager networkManager;
 
+	private MessageParser messageParser;
+
 	// Use this for initialization
 	void Awake (){
 		// Initiate the connection. If failed, show something and quit
@@ -116,6 +118,20 @@ public class MotorController : MonoBehaviour {
 			// TODO:Show something as then quit
 			Application.LoadLevel(2);
 		}
+
+		// Initate the MessageParser
+		PlayerManager playerManager = gameObject.GetComponent<PlayerManager>();
+		if (playerManager == null) {
+			Debug.Log("Cannot find the playermanager");	
+			return ;
+		}
+		Debug.Log("Get playerManager");
+		messageParser = new MessageParser(playerManager);
+
+		Message msg = new Message ();
+		msg.setType("testing");
+		msg.setUserName("hello ds");
+		networkManager.writeSocket(msg.toJsonString());
 
 		moveDirection = transform.TransformDirection(Vector3.forward);
 
@@ -368,21 +384,15 @@ public class MotorController : MonoBehaviour {
 		transform.rotation = Quaternion.LookRotation(moveDirection);
 
 		// Send out direction, movement
-		Message toSentMessage = new Message("1", "update", transform.position, v, h);
+		Message toSentMessage = new Message("1", "testing", transform.position, v, h, 1, movement, transform.rotation);
 		networkManager.writeSocket(toSentMessage.toJsonString());
 		Debug.Log("Sent Message");
 
-		// Process received messages
-		PlayerManager playerManager = gameObject.GetComponent<PlayerManager>();
-		if (playerManager == null) {
-			Debug.Log("Cannot find the playermanager");	
-			return ;
-		}
-		Debug.Log("Get playerManager");
-
+		// Receive incoming message
 		Message receivedMessage = networkManager.receive();
 		while (receivedMessage != null) {
 			Debug.Log("HELLO" + receivedMessage.getUserID());
+			messageParser.ParseMessage(receivedMessage);
 			receivedMessage = networkManager.receive();
 		}
 	}

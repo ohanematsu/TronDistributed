@@ -18,8 +18,8 @@ public class NetworkManager : MonoBehaviour {
 
 	// Fields
 	internal bool mSocketReady = false;
-	private string mIpAddr = "127.0.0.1";
-	private int mPort = 13540;
+	private string mIpAddr = "128.237.212.211";
+	private int mPort = 9999;
 	private string mUserID = "";
 	private TcpClient mClientSocket;
 	private NetworkStream mStream;
@@ -192,5 +192,9 @@ public class NetworkManager : MonoBehaviour {
 		mClientSocket.Close();
 		mSocketReady = false;
 		mConnThread.Abort();
+	}
+
+	public bool GetSocketState() {
+		return mSocketReady;
 	}
 }
