@@ -108,9 +108,10 @@ public class MotorController : MonoBehaviour {
 		messageParser = new MessageParser(this, playerManager, networkManager);
 
 		Message msg = new Message ();
-		msg.setType("testing");
-		msg.setUserName("hello ds");
+		msg.setType(MessageParser.JOIN_USER);
+		msg.setUserName(networkManager.GetUserID());
 		networkManager.writeSocket(msg.toJsonString());
+		Debug.Log("Send join game message");
 
 		moveDirection = transform.TransformDirection(Vector3.forward);
 

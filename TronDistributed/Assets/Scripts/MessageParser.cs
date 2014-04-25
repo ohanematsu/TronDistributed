@@ -98,6 +98,9 @@ public class MessageParser {
 		
 	private void HandleUpdateUserMessage(Message message) {
 		Debug.Log("HandleUpdateUserMessage");
+		if (networkManager.GetUserID () == message.getUserID()) {
+			return ;
+		}
 		playerManager.updatePlayerBasedOnNetwork(message.getUserID(), message.getPosition (), message.getMovement(),
 		                                         message.getHorizontalDir(), message.getVerticalDir(),
 		                                         message.getRotation(), message.getTime());
