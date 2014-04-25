@@ -8,14 +8,14 @@ public class MessageParser {
 	private MotorController motorController;
 	private NetworkManager networkManager;
 
-	private string JOIN_USER = "join_game"; // this type of message is only received by the ui of super node
-	private string UPDATE_USER = "update";
-	private string DELETE_USER = "delete_user";
-	private string JOIN_USER_RESPONSE = "join_game_response"; // add new player
-	private string USER_CRASH = "crash";
-	private string PAUSE = "pause_game";
-	private string RESUME = "resume_game";
-	private string GAME_OVER = "game_over";
+	public static string JOIN_USER = "join_game"; // this type of message is only received by the ui of super node
+	public static string UPDATE_USER = "update";
+	public static string DELETE_USER = "delete_user";
+	public static string JOIN_USER_RESPONSE = "join_game_response"; // add new player
+	public static string USER_CRASH = "crash";
+	public static string PAUSE = "pause_game";
+	public static string RESUME = "resume_game";
+	public static string GAME_OVER = "game_over";
 	
 	public MessageParser(MotorController gameMotorController, PlayerManager gamePlayerManager, 
 	                     NetworkManager gameNetworkManager) {

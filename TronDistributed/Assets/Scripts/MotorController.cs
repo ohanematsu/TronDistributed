@@ -79,6 +79,8 @@ public class MotorController : MonoBehaviour {
 
 	private bool paused = false;
 
+	private bool directionChanged = false;
+
 	// Use this for initialization
 	void Awake (){
 		// Initiate the connection. If failed, show something and quit
@@ -157,10 +159,16 @@ public class MotorController : MonoBehaviour {
 		float newH = Input.GetAxisRaw("Horizontal");
 
 		if (newV != 0) {
+			if (newV != v) {
+				directionChanged = true;
+			}
 			v = newV;
 			h = 0;
 		}
 		if (newH != 0) {
+			if (newH != h) {
+				directionChanged = true;
+			}
 			h = newH;
 			v = 0;
 		}
@@ -228,74 +236,8 @@ public class MotorController : MonoBehaviour {
 			if (moveSpeed < walkSpeed * 0.3f) {
 				walkTimeStart = Time.time;
 			}		
-		//} else { // In air controls
-			// Lock camera while in air
-			/*
-			if (jumping) {
-				lockCameraTimer = 0.0f;
-			} */
 
-			/*
-			if (isMoving) {
-				inAirVelocity += targetDirection.normalized * Time.deltaTime * inAirControlAcceleration;
-			}*/
-		//}
 	}
-	
-	/*void ApplyJumping () {
-		
-		// Prevent jumping too fast after each other
-		if (lastJumpTime + jumpRepeatTime > Time.time) {
-			return;
-		}
-
-		if (IsGrounded()) {
-			// Jump
-			// - Only when pressing the button down
-			// - With a timeout so you can press the button slightly before landing     
-			if (canJump && Time.time < lastJumpButtonTime + jumpTimeout) {
-				verticalSpeed = CalculateJumpVerticalSpeed (jumpHeight);
-				SendMessage("DidJump", SendMessageOptions.DontRequireReceiver);	
-			}
-		}
-	}*/
-
-	/*
-	void ApplyGravity () {
-		if (isControllable) {// don't move player at all if not controllable.
-			// Apply gravity
-			//bool jumpButton= Input.GetButton("Jump");
-
-			// When we reach the apex of the jump we send out a message
-			if (jumping && !jumpingReachedApex && verticalSpeed <= 0.0f) {
-				jumpingReachedApex = true;				
-				SendMessage("DidJumpReachApex", SendMessageOptions.DontRequireReceiver);			
-			}
-			
-			if (IsGrounded()) {
-				verticalSpeed = 0.0f;
-			}// else {
-			//	verticalSpeed -= gravity * Time.deltaTime;
-			//}
-		}
-	}*/
-
-	/*
-	float CalculateJumpVerticalSpeed ( float targetJumpHeight  ){
-		// From the jump height and gravity we deduce the upwards speed 
-		// for the character to reach at the apex.
-		return Mathf.Sqrt(2 * targetJumpHeight * gravity);
-	}*/
-
-	/*
-	void DidJump (){
-		jumping = true;
-		jumpingReachedApex = false;
-		lastJumpTime = Time.time;
-		lastJumpStartHeight = transform.position.y;
-		lastJumpButtonTime = -10;
-		_characterState = CharacterState.Jumping;
-	}*/
 	
 	void Update (){
 		if (paused) {
@@ -365,9 +307,13 @@ public class MotorController : MonoBehaviour {
 		transform.rotation = Quaternion.LookRotation(moveDirection);
 
 		// Send out direction, movement
-		Message toSentMessage = new Message("1", "testing", transform.position, v, h, 1, movement, transform.rotation);
-		networkManager.writeSocket(toSentMessage.toJsonString());
-		Debug.Log("Sent Message");
+		if (directionChanged) {
+			Message toSentMessage = new Message(networkManager.GetUserID(), MessageParser.UPDATE_USER, transform.position, 
+			                                    v, h, 1, movement, transform.rotation);
+			networkManager.writeSocket (toSentMessage.toJsonString ());
+			Debug.Log ("Sent Message");
+			directionChanged = false; //Reset
+		}
 
 		// Receive incoming message
 		Message receivedMessage = networkManager.receive();
@@ -418,5 +364,11 @@ public class MotorController : MonoBehaviour {
 	
 	public void setPauseState(bool state) {
 		paused = state;
+	}
+
+	public void setInitParameter(Vector3 initPos, float initH, float initV) {
+		transform.position = initPos;
+		h = initH;
+		v = initV;
 	}
 }

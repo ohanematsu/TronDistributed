@@ -197,4 +197,8 @@ public class NetworkManager : MonoBehaviour {
 	public bool GetSocketState() {
 		return mSocketReady;
 	}
+
+	public string GetUserID() {
+		return mUserID;
+	}
 }
