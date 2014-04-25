@@ -1,0 +1,201 @@
+﻿using UnityEngine;
+using System.Collections;
+using System.Net;
+using System.Text;
+using System.Net.Sockets;
+using System.Threading;
+using System.IO;
+using System.Runtime.Serialization;
+using System;
+
+//using SimpleJSON;
+
+/**
+ *  NetworkManager - a class that communicates with the game logic processing unit via 
+ * 					 json formatted message
+ */
+public class NetworkManager : MonoBehaviour {
+
+	// Fields
+	internal bool mSocketReady = false;
+	private string mIpAddr = "127.0.0.1";
+	private int mPort = 13540;
+	private string mUserID = "";
+	private TcpClient mClientSocket;
+	private NetworkStream mStream;
+	private StreamWriter mWriter;
+	private StreamReader mReader;
+	private Thread mConnThread;
+
+	private Queue mMsgQueue = new Queue();
+
+	// For debugging message exchange
+	void OnGUI() {
+		if (!mSocketReady) {
+			GUI.Label (new Rect (10, 10, 200, 20), "Status: Disconnected");
+		}
+		else {
+			GUI.Label (new Rect (10, 10, 200, 20), "Status: Connected");
+		}
+
+		GUI.Label (new Rect (200, 10, 200, 20), "Queue count: " + mMsgQueue.Count.ToString());
+
+		/* 
+		 * Event Simulation for debugging
+		 */
+		if (GUI.Button(new Rect(10, 110, 120, 20), "Read Message"))
+		{
+			// Print the received message
+			Message msg = receive();
+
+			if(msg != null)
+			{
+				msg.printMessage();
+			}
+			else
+			{
+				Debug.Log("There are no more messages in the queue");
+			}
+		}
+		if (GUI.Button(new Rect(10, 90, 120, 20), "Send Message"))
+		{
+			Debug.Log("Sending message....");
+			//string msg = "{\"Name\":\"test\", \"array\":[1,{\"data\":\"value\"}]}";
+			//string msg = "{\"Type\":\"test\", \"UserName\":5, \"VerticalDir\":1.5, \"HorizontalDir\":5.8, \"PosX\":3.0, \"PosY\":6.0, \"PosZ\":10.0}";
+			//Debug.Log ("msg test: " + msg);
+			Message m = new Message (mUserID, "test1", new Vector3 (1.54f, 4.37f, 10.59f), 5.0f, 10.0f);
+			Debug.Log ("real message str: " + m.toJsonString());
+			//writeSocket(msg);
+			writeSocket(m.toJsonString());
+		}
+
+		if (GUI.Button(new Rect(10, 50, 160, 20), "Establish Connection"))
+		{
+			// Initialize the connection to the game logic componenet
+			initialize();
+		}
+
+		if (GUI.Button(new Rect(10, 70, 160, 20), "Disconnect"))
+		{
+			// Close the connection to the game logic componenet
+			closeSocket();
+		}
+
+	}
+
+	// This function is invoked to initialize variables, stuff, etc
+	void Start() 
+	{
+		// Dummy function
+		// May there are other stuffs that need to be initialized?
+		mUserID = mIpAddr + ":" + mPort.ToString();
+	}
+
+	// This is where the socket is setup and the connthread is established
+	public void initialize()
+	{
+		Debug.Log("Initializing....");
+		
+		// Establish the connection with the game message processing component
+		int ret = setupSocket();
+
+		if(ret == 0)
+		{
+			// Start the msg receiving thread
+			this.mConnThread = new Thread(new ThreadStart(handleConn));
+			this.mConnThread.Start();
+
+			// Initialize message queue
+			//mMsgQueue = new Queue();
+		}
+		else
+		{
+			Debug.Log("Initialization error - Setup Socket failed");
+		}
+	}
+
+	// This is the actual implementation of establishing connection
+	public int setupSocket() 
+	{ 
+		int result = 0;
+
+		try {
+			Debug.Log("Set up socket");
+			mClientSocket = new TcpClient(mIpAddr, mPort);
+			mStream = mClientSocket.GetStream(); 
+			mWriter = new StreamWriter(mStream);
+			mReader = new StreamReader(mStream);
+			mSocketReady = true;
+			Debug.Log("Done set up socket");
+			result = 0;
+		}
+		catch (Exception e) {
+			Debug.Log("Socket error: " + e);
+			result = -1;
+		}
+
+		return result;
+	}
+
+	// Send the message over the output stream of the established socket
+	public void writeSocket(string theLine) {
+		if (!mSocketReady)
+			return;
+		String msg = theLine + "\r\n";
+		mWriter.Write(msg);
+		mWriter.Flush();
+		
+	}
+
+	// Threaded function that handles events of receiving message
+	public void handleConn() {
+		if (!mSocketReady) {
+			return;	
+		}
+						 
+		// More to be done in this loop?
+		// Like putting the message in queue?
+		while (true) {
+			string message = mReader.ReadLine();
+			Debug.Log ("recved message: " + message);
+
+			Message recved_msg = new Message(message);
+			//recved_msg.printMessage();
+
+			Debug.Log ("Enqueuing received message...");
+			mMsgQueue.Enqueue(recved_msg);
+		}
+	}
+
+	// Dequeue the message received from the game logic, if any, and return it to the 
+	// caller
+	public Message receive()
+	{
+		Message dq_msg = null;
+		Debug.Log("poll the queue!");
+
+		if(mMsgQueue.Count > 0)
+		{
+			Debug.Log("Dequeueing message....");
+			dq_msg = (Message) mMsgQueue.Dequeue();
+		}
+
+		return dq_msg;
+	}
+
+	// Close the connection
+	public void closeSocket() {
+		if (!mSocketReady)
+			return;
+
+		mWriter.Close();
+		mReader.Close();
+		mClientSocket.Close();
+		mSocketReady = false;
+		mConnThread.Abort();
+	}
+
+	public Boolean GetSocketState() {
+		return mSocketReady;
+	}
+}

@@ -1,0 +1,18 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\MessageParer.cs">
+    <Files>
+      <File FileName="Assets\Scripts\MotorController.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\PlayerManager.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\NetworkManager.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\CollisionDetector.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Message.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\PrefabOperator.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\MessageParer.cs" Line="5" Column="25" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
