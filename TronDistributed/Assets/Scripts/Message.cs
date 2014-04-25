@@ -125,6 +125,18 @@ public class Message {
 		return mType;
 	}
 
+	public int getTime() {
+		return mTime;
+	}
+
+	public Vector3 getMovement() {
+		return mMovement;
+	}
+
+	public Quaternion getRotation() {
+		return mRotation;
+	}
+
 	// Converts the data fields of a message into json string so
 	// it can be transmitted in json format
 	public string toJsonString()
@@ -149,7 +161,7 @@ public class Message {
 
 		string double_quote = "\"";
 		string type_field = "Type";
-		string userName_field = "UserName";
+		string userName_field = "UserID";
 		string verti_field = "VerticalDir";
 		string hori_field = "HorizontalDir";
 		string posx_filed = "PosX";

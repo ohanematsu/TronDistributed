@@ -5,32 +5,37 @@ using System.Collections;
 public class PlayerManager : MonoBehaviour{
 	public GameObject otherPlayer; // Don't change it. It is set in the editor
 
-	protected Dictionary<int, Player> remotePlayers;
+	protected Dictionary<string, Player> remotePlayers;
 
 	public float otherPlayerSpeed = 0.1f;
 
+	private bool paused = false;
+
 	// Initialization
 	void Start () {
-		remotePlayers = new Dictionary<int, Player>();
+		remotePlayers = new Dictionary<string, Player>();
 	}
 
 	// Called every fixed framerate frame, if the MonoBehaviour is enabled.
 	void FixedUpdate () {
-		Debug.Log("Try to update all players locally");
-		float curTime = Time.time;
-		for (int i = 0; i < remotePlayers.Count; i++) {
-			remotePlayers[i].UpdateLocally(curTime);
+		if (paused) {
+			return ;
+		}
+
+		Debug.Log ("Update all players locally");
+		foreach (KeyValuePair<string, Player> pair in remotePlayers) {
+			pair.Value.UpdateLocally(Time.fixedTime);
 		}
 	}
 
-	public bool AddNewPlayer(int id, Vector3 startPos, Vector3 startDirection) {
+	public bool AddNewPlayer(string id, Vector3 startPos, float h, float v, Quaternion startRotation, int logicTime) {
 		if (remotePlayers.ContainsKey(id)) {
 			return false;
 		}
 
 		// Instantiate prefabs
 		GameObject playerPrefab = Instantiate(otherPlayer, startPos, Quaternion.identity) as GameObject;
-		playerPrefab.transform.rotation = Quaternion.LookRotation(startDirection);
+		//playerPrefab.transform.rotation = Quaternion.LookRotation(startDirection);
 		playerPrefab.AddComponent<CapsuleCollider>();
 		playerPrefab.AddComponent<TrailRenderer>();
 		Debug.Log("Instantiate prefab for player " + id + " complete");
@@ -38,14 +43,14 @@ public class PlayerManager : MonoBehaviour{
 		// Create player
 		float curTime = Time.time;
 		Player newPlayer = new Player();
-		newPlayer.SetStartState(id, playerPrefab, startPos, startDirection, otherPlayerSpeed, curTime);
+		newPlayer.SetStartState(playerPrefab, otherPlayerSpeed, id, h, v, startPos, logicTime, Time.fixedTime);
 		remotePlayers.Add(id, newPlayer);
 		Debug.Log("Initate player " + id + " complete");
 
 		return true;
 	}
 
-	public bool RemovePlayer(int id) {
+	public bool RemovePlayer(string id) {
 		if (!remotePlayers.ContainsKey(id)) {
 			return false;
 		}
@@ -58,14 +63,25 @@ public class PlayerManager : MonoBehaviour{
 		return true;
 	}
 
-	public bool updatePlayerBasedOnNetwork(int id, Vector3 direction, Vector3 movement) {
-		if (!remotePlayers.ContainsKey(id)) {
+	public bool updatePlayerBasedOnNetwork(string id, Vector3 pos, Vector3 movement,
+	                                       float h, float v, Quaternion rotation, int curLogicTime) {
+		if (paused) {
 			return false;
 		}
 
-		float curTime = Time.time;
-		remotePlayers[id].UpdateBasedOnNetwork (direction, movement, curTime);
+		if (!remotePlayers.ContainsKey(id)){
+			return false;
+		}
 
+		remotePlayers[id].UpdateBasedOnNetwork(pos, movement, h, v, rotation, curLogicTime, Time.time);
 		return true;
+	}
+
+	public bool isPaused() {
+		return paused;
+	}
+
+	public void setPauseState(bool state) {
+		paused = state;
 	}
 }

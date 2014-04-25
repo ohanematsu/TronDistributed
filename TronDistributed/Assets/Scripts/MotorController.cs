@@ -47,12 +47,6 @@ public class MotorController : MonoBehaviour {
 	public float rotateSpeed = 500.0F;
 	public float trotAfterSeconds = 3.0F;
 
-	//public bool canJump= true;
-
-	//private float jumpRepeatTime = 0.05F;
-	//private float jumpTimeout = 0.15F;
-	//private float groundedTimeout = 0.25F;
-
 	// The camera doesnt start following the target immediately but waits for a split second to avoid too much waving around.
 	private float lockCameraTimer = 0.0F;
 
@@ -65,13 +59,6 @@ public class MotorController : MonoBehaviour {
 	// The current x-z move speed
 	private float moveSpeed = 0.0F;
 
-	// The last collision flags returned from controller.Move
-	//private CollisionFlags collisionFlags ; 
-
-	// Are we jumping? (Initiated with jump button and not grounded yet)
-	//private bool jumping = false;
-	//private bool jumpingReachedApex = false;
-
 	// Are we moving backwards (This locks the camera to not do a 180 degree spin)
 	private bool movingBack = false;
 	
@@ -80,18 +67,6 @@ public class MotorController : MonoBehaviour {
 	
 	// When did the user start walking (Used for going into trot after a while)
 	private float walkTimeStart = 0.0F;
-	
-	// Last time the jump button was clicked down
-	//private float lastJumpButtonTime = -10.0F;
-	
-	// Last time we performed a jump
-	//private float lastJumpTime = -1.0F;
-
-	// the height we jumped from (Used to determine for how long to apply extra jump power after jumping.)
-	//private float lastJumpStartHeight = 0.0F;
-
-	//private Vector3 inAirVelocity = Vector3.zero;
-	//private float lastGroundedTime = 0.0F;
 
 	private bool isControllable = true;
 
@@ -101,6 +76,8 @@ public class MotorController : MonoBehaviour {
 	private NetworkManager networkManager;
 
 	private MessageParser messageParser;
+
+	private bool paused = false;
 
 	// Use this for initialization
 	void Awake (){
@@ -126,7 +103,7 @@ public class MotorController : MonoBehaviour {
 			return ;
 		}
 		Debug.Log("Get playerManager");
-		messageParser = new MessageParser(playerManager);
+		messageParser = new MessageParser(this, playerManager);
 
 		Message msg = new Message ();
 		msg.setType("testing");
@@ -321,6 +298,10 @@ public class MotorController : MonoBehaviour {
 	}*/
 	
 	void Update (){
+		if (paused) {
+			return ;
+		}
+
 		if (!isControllable) {
 			// kill all inputs if not controllable.
 			Input.ResetInputAxes();
@@ -429,5 +410,13 @@ public class MotorController : MonoBehaviour {
 
 	void Reset() {
 		gameObject.tag = "Player";
+	}
+
+	public bool isPaused() {
+		return paused;
+	}
+	
+	public void setPauseState(bool state) {
+		paused = state;
 	}
 }
