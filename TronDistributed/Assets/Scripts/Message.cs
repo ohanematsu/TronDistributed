@@ -15,6 +15,10 @@ public class Message {
 	private float mVerticDir;
 	private float mHoriDir;
 
+	public int mTime;
+	public Vector3 mMovement;
+	public Quaternion mRotation;
+
 	// Default Constructor
 	public Message()
 	{
@@ -22,16 +26,22 @@ public class Message {
 		mPosition = Vector3.zero;
 		mVerticDir = 0.0f;
 		mHoriDir = 0.0f;
+		mTime = 0;
+		mMovement = Vector3.zero;
+		mRotation = new Quaternion (0f, 0f, 0f, 0f);
 	}
 
 	// Generic Constructor
-	public Message(string userID, string type, Vector3 pos, float verti, float hori)
+	public Message(string userID, string type, Vector3 pos, float verti, float hori, int time, Vector3 mov, Quaternion rot)
 	{
 		mUserID = userID;
 		mType = type;
 		mPosition = new Vector3 (pos.x, pos.y, pos.z);
 		mVerticDir = verti;
 		mHoriDir = hori;
+		mTime = time;
+		mMovement = new Vector3 (mov.x, mov.y, mov.z);
+		mRotation = new Quaternion (rot.x, rot.y, rot.z, rot.w);
 	}
 
 	// Constructor based on Json string
@@ -47,6 +57,20 @@ public class Message {
 		mPosition = new Vector3(pos_x, pos_y, pos_z);
 		mVerticDir = N ["VerticalDir"].AsFloat;
 		mHoriDir = N ["HorizontalDir"].AsFloat;
+
+		float mov_x = N["MovX"].AsFloat;
+		float mov_y = N["MovY"].AsFloat;
+		float mov_z = N["MovZ"].AsFloat;
+
+		mTime = N["Time"].AsInt;
+		mMovement = new Vector3 (mov_x, mov_y, mov_z);
+
+		float rot_x = N["RotX"].AsFloat;
+		float rot_y = N["RotY"].AsFloat;
+		float rot_z = N["RotZ"].AsFloat;
+		float rot_w = N["RotW"].AsFloat;
+
+		mRotation = new Quaternion (rot_x, rot_y, rot_z, rot_w);
 	}
 
 	// Setters
@@ -132,6 +156,17 @@ public class Message {
 		string posy_filed = "PosY";
 		string posz_filed = "PosZ";
 
+		string mov_x_field = "MovX";
+		string mov_y_field = "MovY";
+		string mov_z_field = "MovZ";
+		
+		string time_field = "Time";
+		
+		string rot_x_field = "RotX";
+		string rot_y_field = "RotY";
+		string rot_z_field = "RotZ";
+		string rot_w_field = "RotW";
+
 		// Convert the message fields to json string
 		result += "{";
 		result += (double_quote + type_field + double_quote + ":" + double_quote + mType + double_quote + ", ");
@@ -140,7 +175,17 @@ public class Message {
 		result += (double_quote + hori_field + double_quote + ":" + mHoriDir.ToString("0.00") + ", ");
 		result += (double_quote + posx_filed + double_quote + ":" + mPosition.x + ", ");
 		result += (double_quote + posy_filed + double_quote + ":" + mPosition.y + ", ");
-		result += (double_quote + posz_filed + double_quote + ":" + mPosition.z);
+		result += (double_quote + posz_filed + double_quote + ":" + mPosition.z + ", ");
+
+		result += (double_quote + time_field + double_quote + ":" + mTime + ", ");
+		result += (double_quote + mov_x_field + double_quote + ":" + mMovement.x + ", ");
+		result += (double_quote + mov_y_field + double_quote + ":" + mMovement.y + ", ");
+		result += (double_quote + mov_z_field + double_quote + ":" + mMovement.z + ", ");
+
+		result += (double_quote + rot_x_field + double_quote + ":" + mRotation.x + ", ");
+		result += (double_quote + rot_y_field + double_quote + ":" + mRotation.y + ", ");
+		result += (double_quote + rot_z_field + double_quote + ":" + mRotation.z + ", ");
+		result += (double_quote + rot_w_field + double_quote + ":" + mRotation.w);
 		result += "}";
 
 		return result;
@@ -149,7 +194,10 @@ public class Message {
 	// Print/Debug the message content
 	public void printMessage()
 	{
-		Debug.Log ("msg var\nUserName: " + mUserID + "\nType: " + mType + "\nVertical Dir: " + mVerticDir.ToString("0.00") + "\nHorizontal Dir: " + mHoriDir.ToString("0.00") + "\nPosition: " + mPosition.ToString("0.00"));
+		Debug.Log ("msg var\nUserName: " + mUserID + "\nType: " + mType + "\nVertical Dir: " + 
+		           mVerticDir.ToString("0.00") + "\nHorizontal Dir: " + mHoriDir.ToString("0.00") + 
+		           "\nPosition: " + mPosition.ToString("0.00") + "\nTime: " + mTime.ToString() + 
+		           "\nMovement: " + mMovement.ToString("0.00") + "\nRotation: " + mRotation.ToString("0.00"));
 	}
 
 }

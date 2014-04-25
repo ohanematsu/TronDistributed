@@ -63,7 +63,7 @@ public class NetworkManager : MonoBehaviour {
 			//string msg = "{\"Name\":\"test\", \"array\":[1,{\"data\":\"value\"}]}";
 			//string msg = "{\"Type\":\"test\", \"UserName\":5, \"VerticalDir\":1.5, \"HorizontalDir\":5.8, \"PosX\":3.0, \"PosY\":6.0, \"PosZ\":10.0}";
 			//Debug.Log ("msg test: " + msg);
-			Message m = new Message (mUserID, "test1", new Vector3 (1.54f, 4.37f, 10.59f), 5.0f, 10.0f);
+			Message m = new Message (mUserID, "test1", new Vector3 (1.54f, 4.37f, 10.59f), 5.0f, 10.0f, 34, new Vector3(2.34f, 3.45f, 4.56f), new Quaternion(1.11f, 2.22f, 3.33f, 4.44f));
 			Debug.Log ("real message str: " + m.toJsonString());
 			//writeSocket(msg);
 			writeSocket(m.toJsonString());
@@ -172,7 +172,6 @@ public class NetworkManager : MonoBehaviour {
 	public Message receive()
 	{
 		Message dq_msg = null;
-		Debug.Log("poll the queue!");
 
 		if(mMsgQueue.Count > 0)
 		{
@@ -193,9 +192,5 @@ public class NetworkManager : MonoBehaviour {
 		mClientSocket.Close();
 		mSocketReady = false;
 		mConnThread.Abort();
-	}
-
-	public Boolean GetSocketState() {
-		return mSocketReady;
 	}
 }
