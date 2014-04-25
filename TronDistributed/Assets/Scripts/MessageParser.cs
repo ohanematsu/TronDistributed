@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-//public class MessageParser : MonoBehaviour {
-public class MessageParser {
+public class MessageParser : MonoBehaviour {
+//public class MessageParser {
 
 	private PlayerManager playerManager;
 	private MotorController motorController;
@@ -24,7 +24,17 @@ public class MessageParser {
 		playerManager = gamePlayerManager;
 		networkManager = gameNetworkManager;
 	}
-	
+
+	void Update() {
+		// Receive incoming message
+		Message receivedMessage = networkManager.receive();
+		while (receivedMessage != null) {
+			Debug.Log("Message from " + receivedMessage.getUserID());
+			ParseMessage(receivedMessage);
+			receivedMessage = networkManager.receive();
+		}
+	}
+
 	public void ParseMessage(Message message) {
 		string type = message.getType();
 		if (type == JOIN_USER) {

@@ -113,19 +113,6 @@ public class MotorController : MonoBehaviour {
 		networkManager.writeSocket(msg.toJsonString());
 		Debug.Log("Send join game message");
 
-		Message receivedMessage;
-		while (true) {
-			receivedMessage = networkManager.receive();
-			if (receivedMessage == null || receivedMessage.getType() != MessageParser.ADD_USER) {
-				if (receivedMessage != null) {
-					Debug.Log(receivedMessage.getType());
-				}
-				continue;
-			}
-			break;
-		}
-		messageParser.ParseMessage(receivedMessage);
-
 		moveDirection = transform.TransformDirection(Vector3.forward);
 
 		_animation = GetComponent<Animation>();	
@@ -327,14 +314,6 @@ public class MotorController : MonoBehaviour {
 			networkManager.writeSocket (toSentMessage.toJsonString ());
 			Debug.Log ("Sent Message");
 			directionChanged = false; //Reset
-		}
-
-		// Receive incoming message
-		Message receivedMessage = networkManager.receive();
-		while (receivedMessage != null) {
-			Debug.Log("HELLO" + receivedMessage.getUserID());
-			messageParser.ParseMessage(receivedMessage);
-			receivedMessage = networkManager.receive();
 		}
 	}
 	
