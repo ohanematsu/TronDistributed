@@ -9,9 +9,10 @@ public class MessageParser {
 	private NetworkManager networkManager;
 
 	public static string JOIN_USER = "join_game"; // this type of message is only received by the ui of super node
+	public static string JOIN_USER_RESPONSE = "join_game_response";
+	public static string ADD_USER = "add_user";
 	public static string UPDATE_USER = "update";
 	public static string DELETE_USER = "delete_user";
-	public static string JOIN_USER_RESPONSE = "join_game_response"; // add new player
 	public static string USER_CRASH = "crash";
 	public static string PAUSE = "pause_game";
 	public static string RESUME = "resume_game";
@@ -28,6 +29,8 @@ public class MessageParser {
 		string type = message.getType();
 		if (type == JOIN_USER) {
 			HandleJoinMessage (message);
+		} else if (type == ADD_USER) {
+			HandleAddUserMessage(message);
 		} else if (type == UPDATE_USER) {
 			HandleUpdateUserMessage (message);
 		} else if (type == DELETE_USER) {
@@ -38,8 +41,6 @@ public class MessageParser {
 			HandlePauseMessage (message);
 		} else if (type == RESUME) {
 			HandleResumeMessage (message);
-		} else if (type == JOIN_USER_RESPONSE) {
-			HandleJoinResponseMessage (message);
 		} else if (type == GAME_OVER) {
 			HandleGameOverMessage(message);
 		} else {
@@ -76,12 +77,23 @@ public class MessageParser {
 		// Generate response message
 		Message responseMessage = new Message();
 		responseMessage.setUserName(message.getUserID());
-		responseMessage.setType("JOIN_USER_RESPONSE");
+		responseMessage.setType(JOIN_USER_RESPONSE);
 		responseMessage.setPosition(startPos);
 		responseMessage.setHorizontalDir (h);
 		responseMessage.setVerticalDir (v);
 
 		networkManager.writeSocket (responseMessage.toJsonString ());
+	}
+
+	private void HandleAddUserMessage(Message message) {
+		Debug.Log("HandleAddUserMessage");
+		if (networkManager.GetUserID() == message.getUserID()) {
+			motorController.setInitParameter(message.getPosition(), message.getHorizontalDir(), message.getVerticalDir());
+			motorController.setPauseState(false);
+		} else {
+			playerManager.AddNewPlayer(message.getUserID(), message.getPosition(), message.getHorizontalDir(), 
+		                               message.getVerticalDir(), message.getRotation(), message.getTime());
+		}
 	}
 		
 	private void HandleUpdateUserMessage(Message message) {
@@ -111,13 +123,6 @@ public class MessageParser {
 		Debug.Log("HandleResumeUserMessage");
 		motorController.setPauseState(false);
 		playerManager.setPauseState(false);
-	}
-
-	private void HandleJoinResponseMessage(Message message) {
-		Debug.Log("HandleJoinResponseMessage");
-		playerManager.AddNewPlayer(message.getUserID(), message.getPosition(), message.getHorizontalDir(), 
-		                           message.getVerticalDir(), message.getRotation(), message.getTime());
-
 	}
 
 	private void HandleGameOverMessage(Message message) {

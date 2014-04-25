@@ -77,7 +77,7 @@ public class MotorController : MonoBehaviour {
 
 	private MessageParser messageParser;
 
-	private bool paused = false;
+	private bool paused = true;
 
 	private bool directionChanged = false;
 
