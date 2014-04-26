@@ -50,7 +50,7 @@ public class PlayerManager : MonoBehaviour{
 	}
 
 	public void SyncGlobalGameState(Dictionary<string, object> message) {
-		Dictionary<string, object> passedAllUsersGlobalStates = message["passedStates"] as Dictionary<string, object>;
+		Dictionary<string, object> passedAllUsersGlobalStates = message["globalState"] as Dictionary<string, object>;
 		foreach (KeyValuePair<string, object> pair in passedAllUsersGlobalStates) {
 			string userID = pair.Key as string;
 			List<Dictionary<string, object>> messages = pair.Value as List<Dictionary<string, object>>;
@@ -65,45 +65,50 @@ public class PlayerManager : MonoBehaviour{
 		string userID = message["userID"] as string;
 		if (Players.ContainsKey(userID)) {
 			return ;
-		}
+		} 
 
 		// If the user is the one sending out JOIN_GAME message, initiate its position and direction
-		if (userID == gameStateManager.GetUserID ()) {
+		if (userID == gameStateManager.GetUserID()) {
 			InitLocalPlayer(message);
 		} else {
 			InitRemotePlayer(userID, message);
 		}
+
+		List<Dictionary<string, object>> messageList = new List<Dictionary<string, object>>();
+		knownPlayerUnProcessedMsgList.Add(userID, messageList);
 	}
 	
 	private void InitLocalPlayer(Dictionary<string, object> message) {
-		// Parse message
-		float startPosX = (float)(double)message["posX"];
-		float startPosY = (float)(double)message["posY"];
-		float startPosZ = (float)(double)message["posZ"];
-		Vector3 startPos = new Vector3(startPosX, startPosY, startPosZ);
-		float startHorizontalDir = (float)(double)message["horizontalDir"];
-		float startVerticalDir = (float)(double)message["verticalDir"];
-		int startLogicTime = (int)message["time"];
+		float initPosX = (float)(double)message["posX"];
+		float initPosY = (float)(double)message["posY"];
+		float initPosZ = (float)(double)message["posZ"];
+		Vector3 initPosition = new Vector3(initPosX, initPosY, initPosZ);
+
+		float initHorizontalDir = (float)(double)message["horizontalDir"];
+		float initVerticalDir = (float)(double)message["verticalDir"];
 
 		// Initiate start position and direction
-		gameStateManager.GetMotorController().SetInitParameters(startPos, startHorizontalDir, startVerticalDir);
+		gameStateManager.GetMotorController().SetInitParameters(initPosition, initHorizontalDir, initVerticalDir);
 
 		// Enable update
 		gameStateManager.setPauseState(false);
+
+		// Instantiate prefabs
+		GameObject playerPrefab = Instantiate(otherPlayer, initPosition, Quaternion.identity) as GameObject;
+		Player newPlayer = new Player();
+		newPlayer.SetStartState(playerPrefab, otherPlayerSpeed, message);
+		Players.Add(gameStateManager.GetUserID(), newPlayer);
 	}
 
 	private void InitRemotePlayer(string userID, Dictionary<string, object> message) {
-		// Parse message
-		float startPosX = (float)(double)message["posX"];
-		float startPosY = (float)(double)message["posY"];
-		float startPosZ = (float)(double)message["posZ"];
-		Vector3 startPos = new Vector3(startPosX, startPosY, startPosZ);
-		float startHorizontalDir = (float)(double)message["horizontalDir"];
-		float startVerticalDir = (float)(double)message["verticalDir"];
-		int startLogicTime = (int)message["time"];
-		
+		float initPosX = (float)(double)message["posX"];
+		float initPosY = (float)(double)message["posY"];
+		float initPosZ = (float)(double)message["posZ"];
+		Vector3 initPosition = new Vector3(initPosX, initPosY, initPosZ);
+
 		// Instantiate prefabs
-		GameObject playerPrefab = Instantiate(otherPlayer, startPos, Quaternion.identity) as GameObject;
+		GameObject playerPrefab = Instantiate(otherPlayer, initPosition, Quaternion.identity) as GameObject;
+
 		//playerPrefab.transform.rotation = Quaternion.LookRotation(startDirection);
 		playerPrefab.AddComponent<CapsuleCollider>();
 		playerPrefab.AddComponent<TrailRenderer>();
@@ -145,11 +150,6 @@ public class PlayerManager : MonoBehaviour{
 	}
 
 	public void UpdateRemotePlayer(string userID, Dictionary<string, object> message) {
-		// Parse message
-		float horizontalDir = (float)(double)message["horizontalDir"];
-		float verticalDir = (float)(double)message["verticalDir"];
-		int curLogicTime = (int)message["time"];
-
 		// Update remote player
 		Players [userID].UpdateBasedOnNetwork(message, Time.fixedDeltaTime);
 	}
@@ -167,14 +167,17 @@ public class PlayerManager : MonoBehaviour{
 		Debug.Log("Remove player " + userID + " complete");
 	}
 
-	public Dictionary<string, object> GenerateACKMessage() {
-		Dictionary<string, object> processedStates = new Dictionary<string, object>();
+	public Dictionary<string, object> GenerateACKMessage(string targetUserId) {
+		Dictionary<string, object> globalStateMessage = new Dictionary<string, object>();
 		foreach (KeyValuePair<string, Player> playerPair in Players) {
-			List<Dictionary<string, object>> processedMessages = playerPair.Value.GetProcessedMessage();
-			processedStates.Add(playerPair.Key, processedMessages);
+			globalStateMessage.Add(playerPair.Key, playerPair.Value.GetProcessedMessage());
 		}
+
 		Dictionary<string, object> ackMessage = new Dictionary<string, object>();
-		ackMessage.Add("passedStates", processedStates);
+		ackMessage.Add("type", MessageDispatcher.JOIN_GAME_ACK);
+		ackMessage.Add("userID", targetUserId);
+		ackMessage.Add("globalState", globalStateMessage);
+		ackMessage.Add("time", gameStateManager.GetCurLogicTime ());
 		return ackMessage;
 	}
 
@@ -186,9 +189,7 @@ public class PlayerManager : MonoBehaviour{
 
 		messageHandlerList.Add(MessageDispatcher.JOIN_GAME_ACK, SyncGlobalGameState);
 		messageHandlerList.Add(MessageDispatcher.ADD_USER,      AddNewPlayer);
-		//messageHandlerList.Add(MessageDispatcher.ADD_LOCAL,     InitLocalPlayer);
 		messageHandlerList.Add(MessageDispatcher.UPDATE_USER,   UpdatePlayer);
-		//messageHandlerList.Add(MessageDispatcher.UPDATE_LOCAL,  UpdateLocalPlayer);
 		messageHandlerList.Add(MessageDispatcher.DELETE_USER,   RemovePlayer);
 		messageHandlerList.Add(MessageDispatcher.USER_CRASH,    RemovePlayer);
 	}
@@ -202,18 +203,20 @@ public class PlayerManager : MonoBehaviour{
 		
 		// Process message of known players
 		foreach (KeyValuePair<string, Player> pair in Players) {
+			// If this player has unprocessed messages, process them first
 			if (knownPlayerUnProcessedMsgList[pair.Key].Count != 0) {
-				// If this player has unprocessed message, process it
 				foreach (Dictionary<string, object> msg in knownPlayerUnProcessedMsgList[pair.Key]) {
 					Dispatch(msg);
 				}
-			} else {
-				// If this player doesn't have unprocessed message, do normal prediction
+			}
+
+			// Update the player
+			if (pair.Key != gameStateManager.GetUserID()) {
 				pair.Value.UpdateBasedOnPrediction(gameStateManager.GetCurLogicTime(), Time.fixedTime);
 			}
 		}
 		
-		// Process message for unknown players
+		// Process messages for unknown players
 		foreach (Dictionary<string, object> msg in unknownPlayerUnProcessedMsgList) {
 			Dispatch(msg);
 		}

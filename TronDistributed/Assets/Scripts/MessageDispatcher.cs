@@ -6,18 +6,15 @@ public class MessageDispatcher : MonoBehaviour {
 
 	private GameStateManager gameStateManager;
 
-	public static string JOIN_GAME = "join_game";                    // A new player tries to join the game
-	public static string JOIN_USER_RESPONSE = "join_game_response";  //
-	public static string JOIN_GAME_ACK = "join_game_ack";            // Confirm the JOIN_GAME request
-	public static string ADD_USER = "add_user";                      // A new player joins the game
-	//public static string ADD_LOCAL = "add_local";                     // Local user joins the game
-	public static string UPDATE_USER = "update";                    // Update player
-	//public static string UPDATE_LOCAL = "update_local";              // Update local player
-	public static string DELETE_USER = "delete_user";                // Delete a user from the game
-	public static string USER_CRASH = "crash";                       // A remote user crashes
-	public static string PAUSE = "pause_game";                       // Pause the game
-	public static string RESUME = "resume_game";                     // Resume the game
-	public static string GAME_OVER = "game_over";                    // Game over         
+	public static string JOIN_GAME =     "join_game";      // A new player tries to join the game
+	public static string JOIN_GAME_ACK = "join_game_ack";  // Confirm the JOIN_GAME request
+	public static string ADD_USER =      "add_user";       // A new player joins the game
+	public static string UPDATE_USER =   "update";         // Update player
+	public static string DELETE_USER =   "delete_user";    // Delete a user from the game
+	public static string USER_CRASH =    "crash";          // A remote user crashes
+	public static string PAUSE =         "pause_game";     // Pause the game
+	public static string RESUME =        "resume_game";    // Resume the game
+	public static string GAME_OVER =     "game_over";      // Game over         
 
 	private delegate void messageHandler(Dictionary<string, object> message);
 	private static Dictionary<string, messageHandler> messageHandlerList = new Dictionary<string, messageHandler>();
@@ -38,6 +35,11 @@ public class MessageDispatcher : MonoBehaviour {
 		
 	private void HandleJoinGameMessage(Dictionary<string, object> message) {
 		Debug.Log("HandleJoinGameMessage");
+
+		// Generate ack message and send
+		string targetUserID = message["type"] as string;
+		Dictionary<string, object> ackeMessage = gameStateManager.GetPlayerManager().GenerateACKMessage(targetUserID);
+		gameStateManager.GetNetworkManager().writeSocket(ackeMessage);
 
 		// Generate the initial position and direction
 		Vector3 startPos = new Vector3(Random.Range(1.0f, 63.0f), 1, Random.Range(1.0f, 63.0f));
@@ -61,27 +63,25 @@ public class MessageDispatcher : MonoBehaviour {
 			}
 		}
 
-		// Generate response message and send
-		Dictionary<string, object> responseMessage = new Dictionary<string, object>();
-		responseMessage.Add("userID", gameStateManager.GetUserID());
-		responseMessage.Add("type", JOIN_USER_RESPONSE);
-		responseMessage.Add("posX", startPos.x);
-		responseMessage.Add("posY", startPos.y);
-		responseMessage.Add("posZ", startPos.x);
-		responseMessage.Add("honrizontalDir", h);
-		responseMessage.Add("verticalDir", v);
-		gameStateManager.GetNetworkManager().writeSocket(responseMessage);
-
-		// Generate ack message and send
-		Dictionary<string, object> ackeMessage = gameStateManager.GetPlayerManager().GenerateACKMessage();
-		gameStateManager.GetNetworkManager().writeSocket(ackeMessage);
+		// Generate add user message and send
+		Dictionary<string, object> addUserMessage = new Dictionary<string, object>();
+		addUserMessage.Add("type", ADD_USER);
+		addUserMessage.Add("userID", targetUserID);
+		addUserMessage.Add("posX", startPos.x);
+		addUserMessage.Add("posY", startPos.y);
+		addUserMessage.Add("posZ", startPos.x);
+		addUserMessage.Add("honrizontalDir", h);
+		addUserMessage.Add("verticalDir", v);
+		addUserMessage.Add("time", gameStateManager.GetCurLogicTime());
+		gameStateManager.GetNetworkManager().writeSocket(addUserMessage);
 	}
 
 	private void HandleJoinGameACKMessage(Dictionary<string, object> message) {
-
-	}
-
-	private void HandleAddLocalMessage(Dictionary<string, object> message) {
+		Debug.Log("HandleAddUserMessage");
+		string targetUserID = message["userID"] as string;
+		if (targetUserID == gameStateManager.GetUserID ()) {
+			EnqueuePlayerManagerUnProcessedMessageQueue(message);
+		}
 	}
 
 	private void HandleAddUserMessage(Dictionary<string, object> message) {
@@ -91,32 +91,16 @@ public class MessageDispatcher : MonoBehaviour {
 		
 	private void HandleUpdateUserMessage(Dictionary<string, object> message) {
 		Debug.Log("HandleUpdateUserMessage");
-		/*
-		if (networkManager.GetUserID () == message.getUserID()) {
-			return ;
-		}
-		playerManager.updatePlayerBasedOnNetwork(message.getUserID(), message.getPosition (), message.getMovement(),
-		                                         message.getHorizontalDir(), message.getVerticalDir(),
-		                                         message.getRotation(), message.getTime());*/
-		EnqueuePlayerManagerUnProcessedMessageQueue(message);
-	}
-
-	private void HandleUpdateLocalMessage(Dictionary<string, object> message) {
-		Debug.Log("HandleUpdateLocalMessage");
 		EnqueuePlayerManagerUnProcessedMessageQueue(message);
 	}
 		
 	private void HandleDeleteUserMessage(Dictionary<string, object> message) {
 		Debug.Log("HandleDeleteUserMessage");
 		EnqueuePlayerManagerUnProcessedMessageQueue(message);
-		/*
-		playerManager.RemovePlayer(message.getUserID());
-		*/
 	}
 		
 	private void HandleUserCrashMessage(Dictionary<string, object> message) {
 		Debug.Log("HandleUserCrashMessage");
-		/*HandleDeleteUserMessage(message);*/
 		EnqueuePlayerManagerUnProcessedMessageQueue(message);
 	}
 		
@@ -133,9 +117,11 @@ public class MessageDispatcher : MonoBehaviour {
 	private void HandleGameOverMessage(Dictionary<string, object> message) {
 		Debug.Log("HandleGameOverMessage");
 		//TODO
+		Application.LoadLevel(2);
 	}
 
 	private void EnqueuePlayerManagerUnProcessedMessageQueue(Dictionary<string, object> message) {
+		Debug.Log("Enqueue " + message["type"] as string + " message");
 		gameStateManager.GetPlayerManager().EnqueueUnProcessedMessageQueue(message);
 	}
 
@@ -143,9 +129,7 @@ public class MessageDispatcher : MonoBehaviour {
 		messageHandlerList.Add(JOIN_GAME,     HandleJoinGameMessage);
 		messageHandlerList.Add(JOIN_GAME_ACK, HandleJoinGameACKMessage);
 		messageHandlerList.Add(ADD_USER,      HandleAddUserMessage);
-		//messageHandlerList.Add(ADD_LOCAL,     HandleAddLocalMessage);
 		messageHandlerList.Add(UPDATE_USER,   HandleUpdateUserMessage);
-		//messageHandlerList.Add(UPDATE_LOCAL,  HandleUpdateLocalMessage);
 		messageHandlerList.Add(DELETE_USER,   HandleDeleteUserMessage);
 		messageHandlerList.Add(USER_CRASH,    HandleUserCrashMessage);
 		messageHandlerList.Add(PAUSE,         HandlePauseMessage);

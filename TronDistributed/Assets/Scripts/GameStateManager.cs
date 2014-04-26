@@ -29,13 +29,16 @@ public class GameStateManager : MonoBehaviour {
 
 	void FixedUpdate() {
 		if (!paused) {
+			IncrementCurLogicTime();
+
 			// Detect keyboard event and send message to its own playermanager
 			float verticalDir = Input.GetAxisRaw("Vertical");   
 			float horizontalDir = Input.GetAxisRaw("Horizontal");
 			Dictionary<string, object> message = new Dictionary<string, object>();
 			message["type"] = (object)MessageDispatcher.UPDATE_USER;
-			message["verticalDir"] = (object)verticalDir;
+			message["userID"] = (object)userID;
 			message["horizontalDir"] = (object)horizontalDir;
+			message["verticalDir"] = (object)verticalDir;
 			message["time"] = (object)curLogicTime;
 			messageDispatcher.Dispatch(message);
 		}
@@ -147,8 +150,9 @@ public class GameStateManager : MonoBehaviour {
 	private void SendJoinGameMessage() {
 		// Send JOIN_GAME message
 		Dictionary<string, object> message = new Dictionary<string, object>();
-		message.Add("userID", userID);
 		message.Add("type", MessageDispatcher.JOIN_GAME);
+		message.Add("userID", userID);
+		message.Add("time", curLogicTime);
 		networkManager.writeSocket(message);
 		Debug.Log("Send JOIN_GAME message");
 

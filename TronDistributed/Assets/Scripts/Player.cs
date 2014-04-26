@@ -88,7 +88,7 @@ public class Player : MonoBehaviour {
 		curVerticalDir = newVerticalDir;
 	
 		// Update position and rotation
-		UpdateBasedOnPrediction(newLogicTime, fixedDeltaTime);
+		// UpdateBasedOnPrediction(newLogicTime, fixedDeltaTime);
 	}
 
 	public List<Dictionary<string, object>> GetProcessedMessage() {
