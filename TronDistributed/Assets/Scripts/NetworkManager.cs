@@ -19,7 +19,7 @@ public class NetworkManager : MonoBehaviour {
 
 	// Fields
 	internal bool mSocketReady = false;
-	private string mIpAddr = "128.237.217.116";
+	private string mIpAddr = "128.237.220.152";
 	private int mPort = 9999;
 	private string mUserID = "";
 	private TcpClient mClientSocket;

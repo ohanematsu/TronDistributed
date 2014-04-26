@@ -12,6 +12,7 @@ public class GameStateManager : MonoBehaviour {
 	private int curLogicTime;
 	private string userID;
 	private bool paused;
+	private bool receiveMsg;
 
 	void Start() {
 		// Get all components
@@ -25,9 +26,16 @@ public class GameStateManager : MonoBehaviour {
 
 		// Send JOIN_GAME message
 		SendJoinGameMessage();
+
+		// Enable receiving message
+		receiveMsg = true;
 	}
 
 	void FixedUpdate() {
+		if (!receiveMsg) {
+			return ;
+		}
+
 		if (!paused) {
 			IncrementCurLogicTime();
 
@@ -46,7 +54,8 @@ public class GameStateManager : MonoBehaviour {
 		// Deliver received messages
 		Dictionary<string, object> receiveMessage = networkManager.receive();
 		while (receiveMessage != null) {
-			Debug.Log("Message from " + (receiveMessage["userID"] as string));
+			//Debug.Log("Message from " + (receiveMessage["userID"] as string));
+			Debug.Log("Receive " + receiveMessage["type"] + " message!");
 			messageDispatcher.Dispatch(receiveMessage);
 			receiveMessage = networkManager.receive();
 		}
@@ -137,6 +146,8 @@ public class GameStateManager : MonoBehaviour {
 	}
 
 	private void InitGlobalValues() {
+		receiveMsg = false;
+
 		// Initiate logic time
 		curLogicTime = 0;
 
