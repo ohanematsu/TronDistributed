@@ -63,7 +63,9 @@ public class PlayerManager : MonoBehaviour{
 	//public bool AddNewPlayer(string id, Vector3 startPos, float h, float v, Quaternion startRotation, int logicTime) {
 	public void AddNewPlayer(Dictionary<string, object> message) {
 		string userID = message["userID"] as string;
+		Debug.Log("Prepare to add user " + userID);
 		if (Players.ContainsKey(userID)) {
+			Debug.Log("User " + userID + " already exists");
 			return ;
 		} 
 
@@ -79,6 +81,8 @@ public class PlayerManager : MonoBehaviour{
 	}
 	
 	private void InitLocalPlayer(Dictionary<string, object> message) {
+		Debug.Log("Prepare to init local user");
+
 		float initPosX = (float)(double)message["posX"];
 		float initPosY = (float)(double)message["posY"];
 		float initPosZ = (float)(double)message["posZ"];
@@ -89,18 +93,23 @@ public class PlayerManager : MonoBehaviour{
 
 		// Initiate start position and direction
 		gameStateManager.GetMotorController().SetInitParameters(initPosition, initHorizontalDir, initVerticalDir);
-
-		// Enable update
-		gameStateManager.setPauseState(false);
+		Debug.Log("Init local user's position and direction complete");
 
 		// Instantiate prefabs
 		GameObject playerPrefab = Instantiate(otherPlayer, initPosition, Quaternion.identity) as GameObject;
 		Player newPlayer = new Player();
 		newPlayer.SetStartState(playerPrefab, otherPlayerSpeed, message);
 		Players.Add(gameStateManager.GetUserID(), newPlayer);
+		Debug.Log("Init local user complete");
+
+		// Enable update
+		gameStateManager.setPauseState(false);
+		Debug.Log("Enable update");
 	}
 
 	private void InitRemotePlayer(string userID, Dictionary<string, object> message) {
+		Debug.Log("Prepare to init remote user");
+
 		float initPosX = (float)(double)message["posX"];
 		float initPosY = (float)(double)message["posY"];
 		float initPosZ = (float)(double)message["posZ"];
@@ -137,6 +146,8 @@ public class PlayerManager : MonoBehaviour{
 	}
 
 	public void UpdateLocalPlayer(string userID, Dictionary<string, object> message) {
+		Debug.Log("Prepare to update local player");
+
 		// Parse message
 		float horizontalDir = (float)(double)message["horizontalDir"];
 		float verticalDir = (float)(double)message["verticalDir"];
@@ -147,16 +158,22 @@ public class PlayerManager : MonoBehaviour{
 
 		// Update information in player manager
 		Players[userID].GetProcessedMessage().Add(message);
+
+		Debug.Log("Update local player complete");
 	}
 
 	public void UpdateRemotePlayer(string userID, Dictionary<string, object> message) {
+		Debug.Log("Prepare to update remote player");
 		// Update remote player
 		Players [userID].UpdateBasedOnNetwork(message, Time.fixedDeltaTime);
+		Debug.Log("Update remote player complete");
 	}
 
 	public void RemovePlayer(Dictionary<string, object> message) {
+		Debug.Log("Prepare to remove player");
 		string userID = message["userID"] as string;
 		if (!Players.ContainsKey(userID)) {
+			Debug.Log("Player " + userID + "doesn't exsit");
 			return ;
 		}
 	
@@ -168,9 +185,11 @@ public class PlayerManager : MonoBehaviour{
 	}
 
 	public Dictionary<string, object> GenerateACKMessage(string targetUserId) {
+		Debug.Log("Prepare to compare generate ack message");
 		Dictionary<string, object> globalStateMessage = new Dictionary<string, object>();
 		foreach (KeyValuePair<string, Player> playerPair in Players) {
 			globalStateMessage.Add(playerPair.Key, playerPair.Value.GetProcessedMessage());
+			Debug.Log("Add state of user " + playerPair.Key);
 		}
 
 		Dictionary<string, object> ackMessage = new Dictionary<string, object>();
@@ -178,6 +197,7 @@ public class PlayerManager : MonoBehaviour{
 		ackMessage.Add("userID", targetUserId);
 		ackMessage.Add("globalState", globalStateMessage);
 		ackMessage.Add("time", gameStateManager.GetCurLogicTime ());
+		Debug.Log("Generate ack message complete");
 		return ackMessage;
 	}
 
@@ -205,6 +225,7 @@ public class PlayerManager : MonoBehaviour{
 		foreach (KeyValuePair<string, Player> pair in Players) {
 			// If this player has unprocessed messages, process them first
 			if (knownPlayerUnProcessedMsgList[pair.Key].Count != 0) {
+				Debug.Log("Dispatch message for user" + pair.Key);
 				foreach (Dictionary<string, object> msg in knownPlayerUnProcessedMsgList[pair.Key]) {
 					Dispatch(msg);
 				}
