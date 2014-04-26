@@ -48,10 +48,11 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\CollisionDetector.cs" />
      <Compile Include="Assets\Scripts\EscapeMenuControl.cs" />
+     <Compile Include="Assets\Scripts\GameStateManager.cs" />
      <Compile Include="Assets\Scripts\InvisibleBoxLocator.cs" />
      <Compile Include="Assets\Scripts\MainMenuControl.cs" />
      <Compile Include="Assets\Scripts\Message.cs" />
-     <Compile Include="Assets\Scripts\MessageParser.cs" />
+     <Compile Include="Assets\Scripts\MessageDispatcher.cs" />
      <Compile Include="Assets\Scripts\MotorController.cs" />
      <Compile Include="Assets\Scripts\NetworkManager.cs" />
      <Compile Include="Assets\Scripts\PlayHandler.cs" />

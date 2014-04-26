@@ -62,58 +62,24 @@ public class MotorController : MonoBehaviour {
 	// Are we moving backwards (This locks the camera to not do a 180 degree spin)
 	private bool movingBack = false;
 	
-	// Is the user pressing any keys?
-	//private bool isMoving = true;
-	
 	// When did the user start walking (Used for going into trot after a while)
 	private float walkTimeStart = 0.0F;
 
 	private bool isControllable = true;
 
-	private float v = 1;	
-	private float h = 0;
+	private float curVerticalDir = 1;	
+	private float curHorizontalDir = 0;
 
-	private NetworkManager networkManager;
-
-	private MessageParser messageParser;
+	private GameStateManager gameStateManager;
 
 	private bool paused = true;
 
 	private bool directionChanged = false;
 
+	private Vector3 invisiblePlace = new Vector3(32.0f, -10.0f, 32.0f);
+
 	// Use this for initialization
 	void Awake (){
-		// Initiate the connection. If failed, show something and quit
-		networkManager = gameObject.GetComponent<NetworkManager>();
-		if (networkManager == null) {
-			Debug.Log("Cannot find NetworkManager");
-			// TODO:Show something as then quit
-			Application.LoadLevel(2);
-		}
-		Debug.Log("Get network manager success!");
-		networkManager.initialize();
-		if (!networkManager.GetSocketState()) {
-			Debug.Log("Set up connection failed!");
-			// TODO:Show something as then quit
-			Application.LoadLevel(2);
-		}
-
-		// Initate the MessageParser
-		PlayerManager playerManager = gameObject.GetComponent<PlayerManager>();
-		if (playerManager == null) {
-			Debug.Log("Cannot find the playermanager");	
-			return ;
-		}
-		Debug.Log("Get playerManager");
-		messageParser = gameObject.GetComponent<MessageParser>();
-
-
-		Message msg = new Message ();
-		msg.setType(MessageParser.JOIN_USER);
-		msg.setUserName(networkManager.GetUserID());
-		networkManager.writeSocket(msg.toJsonString());
-		Debug.Log("Send join game message");
-
 		moveDirection = transform.TransformDirection(Vector3.forward);
 
 		_animation = GetComponent<Animation>();	
@@ -136,16 +102,57 @@ public class MotorController : MonoBehaviour {
 			Debug.Log("No run animation found. Turning off animations.");
 		}
 	
-		/*
-		if(!jumpPoseAnimation && canJump) {
-			_animation = null;
-			Debug.Log("No jump animation found and the character has canJump enabled. Turning off animations.");
-		}*/
+		// Set initial position is invisible to the player
+		gameObject.transform.position = invisiblePlace;
+
+		// Set initial state as paused
+		paused = true;
 	}
-	
-	void UpdateSmoothedMovementDirection (){
+
+	public void SetGameStateManager(GameStateManager globalGameStateManager) {
+		gameStateManager = globalGameStateManager;
+	}
+
+	public void SetInitParameters(Vector3 initPos, float initHorizontalDir, float initVerticalDir) {
+		gameObject.transform.position = initPos;
+		UpdateSmoothedMovementDirection(initHorizontalDir, initVerticalDir);
+		transform.rotation = Quaternion.LookRotation(moveDirection);
+		directionChanged = false; // Reset
+	}
+
+	public void UpdateMotor(float newHorizontalDir, float newVerticalDir, float fixedDeltaTime) {
+		if (!isControllable) {
+			// kill all inputs if not controllable.
+			Input.ResetInputAxes();
+		}
+
+		// Calculate move direction
+		UpdateSmoothedMovementDirection(newHorizontalDir, newVerticalDir);
+		
+		// Calculate actual action
+		Vector3 movement = moveDirection * moveSpeed;
+		movement *= fixedDeltaTime;
+		
+		// Move the controller
+		CharacterController controller = GetComponent<CharacterController>();
+		//collisionFlags = controller.Move(movement);
+		controller.Move(movement);
+		
+		// Set rotation to the move direction
+		transform.rotation = Quaternion.LookRotation(moveDirection);
+		
+		// If direction changed, send UPDATE_USER message
+		if (directionChanged) {
+			Message toSentMessage = new Message(networkManager.GetUserID(), MessageDispatcher.UPDATE_USER, transform.position, 
+			                                    v, h, gameStateManager.GetCurLogicTime(), movement, transform.rotation);
+			networkManager.writeSocket(toSentMessage.toJsonString());
+			Debug.Log ("Sent Message");
+			directionChanged = false; //Reset
+		}
+	}
+
+	private void UpdateSmoothedMovementDirection(float newHorizontalDir, float newVerticalDir) {
 		Transform cameraTransform = Camera.main.transform;
-		//bool grounded = IsGrounded();
 
 		// Forward vector relative to the camera along the x-z plane    
 		Vector3 forward = cameraTransform.TransformDirection(Vector3.forward); //Vectoe3.forward == Vector3(0, 0, 1).
@@ -155,167 +162,67 @@ public class MotorController : MonoBehaviour {
 		// Right vector relative to the camera
 		// Always orthogonal to the forward vector
 		Vector3 right = new Vector3(forward.z, 0, -forward.x);
-		//float v = Input.GetAxisRaw("Vertical");	
-		//float h = Input.GetAxisRaw("Horizontal");
-		float newV = Input.GetAxisRaw("Vertical");	
-		float newH = Input.GetAxisRaw("Horizontal");
 
-		if (newV != 0) {
-			if (newV != v) {
+		if (newVerticalDir != 0) {
+			if (newVerticalDir != curVerticalDir) {
 				directionChanged = true;
 			}
-			v = newV;
-			h = 0;
+			curVerticalDir = newVerticalDir;
+			curHorizontalDir = 0;
 		}
-		if (newH != 0) {
-			if (newH != h) {
+		if (newHorizontalDir != 0) {
+			if (newHorizontalDir != curHorizontalDir) {
 				directionChanged = true;
 			}
-			h = newH;
-			v = 0;
+			curHorizontalDir = newHorizontalDir;
+			curVerticalDir = 0;
 		}
 
 		// Are we moving backwards or looking backwards
-		if (v < -0.2f) {
+		if (curVerticalDir < -0.2f) {
 			movingBack = true;
 		} else {	
 			movingBack = false;
 		}
-
-		//bool wasMoving = isMoving;
-		//isMoving = Mathf.Abs(h) > 0.1f || Mathf.Abs (v) > 0.1f;
-		//isMoving = true;
 			
 		// Target direction relative to the camera
 		Vector3 targetDirection= h * right + v * forward;
-			
-		// Grounded controls
-		//if (grounded) {
-			// Lock camera for short period when transitioning moving & standing still
-			lockCameraTimer += Time.deltaTime;
-			
-			//if (isMoving != wasMoving) {
-			//	lockCameraTimer = 0.0f;
-			//}
 
-			// We store speed and direction seperately,
-			// so that when the character stands still we still have a valid forward direction	
-			// moveDirection is always normalized, and we only update it if there is user input.	
-			if (targetDirection != Vector3.zero) {
-				// If we are really slow, just snap to the target direction
-				if (moveSpeed < walkSpeed * 0.9f) {// && grounded) {
-					moveDirection = targetDirection.normalized;
-				} else { // Otherwise smoothly turn towards it
-					moveDirection = Vector3.RotateTowards(moveDirection, targetDirection, rotateSpeed * Mathf.Deg2Rad * Time.deltaTime, 1000);
-					moveDirection = moveDirection.normalized;
-				}
-			}
-
-			// Smooth the speed based on the current target direction
-			float curSmooth = speedSmoothing * Time.deltaTime;
-
-			// Choose target speed
-			//* We want to support analog input but make sure you cant walk faster diagonally than just forward or sideways		
-			float targetSpeed = Mathf.Min(targetDirection.magnitude, 1.0f);
-
-			//_characterState = CharacterState.Idle;
-
-			// Pick speed modifier		
-			/*if (Input.GetKey (KeyCode.LeftShift) || Input.GetKey (KeyCode.RightShift)) {
-				targetSpeed *= runSpeed;				
-				_characterState = CharacterState.Running;			
-			} else */ if (Time.time - trotAfterSeconds > walkTimeStart) {
-				targetSpeed *= trotSpeed;
-				//_characterState = CharacterState.Trotting;
-			} else {
-				targetSpeed *= walkSpeed;
-				//_characterState = CharacterState.Walking;
-			}
-
-			moveSpeed = Mathf.Lerp(moveSpeed, targetSpeed, curSmooth);
-
-			// Reset walk time start when we slow down
-			if (moveSpeed < walkSpeed * 0.3f) {
-				walkTimeStart = Time.time;
-			}		
-
-	}
+		// Lock camera for short period when transitioning moving & standing still
+		lockCameraTimer += Time.deltaTime;
 	
-	void Update (){
-		if (paused) {
-			return ;
+		// We store speed and direction seperately,
+		// so that when the character stands still we still have a valid forward direction	
+		// moveDirection is always normalized, and we only update it if there is user input.	
+		if (targetDirection != Vector3.zero) {
+			// If we are really slow, just snap to the target direction
+			if (moveSpeed < walkSpeed * 0.9f) {// && grounded) {
+				moveDirection = targetDirection.normalized;
+			} else { // Otherwise smoothly turn towards it
+				moveDirection = Vector3.RotateTowards(moveDirection, targetDirection, rotateSpeed * Mathf.Deg2Rad * Time.deltaTime, 1000);
+				moveDirection = moveDirection.normalized;
+			}
 		}
 
-		if (!isControllable) {
-			// kill all inputs if not controllable.
-			Input.ResetInputAxes();
+		// Smooth the speed based on the current target direction
+		float curSmooth = speedSmoothing * Time.deltaTime;
+
+		// Choose target speed
+		//* We want to support analog input but make sure you cant walk faster diagonally than just forward or sideways		
+		float targetSpeed = Mathf.Min(targetDirection.magnitude, 1.0f);
+
+		if (Time.time - trotAfterSeconds > walkTimeStart) {
+			targetSpeed *= trotSpeed;
+		} else {
+			targetSpeed *= walkSpeed;
 		}
 
-		/*
-		if (Input.GetButtonDown ("Jump")) {
-			lastJumpButtonTime = Time.time;
-		}*/
+		moveSpeed = Mathf.Lerp(moveSpeed, targetSpeed, curSmooth);
 
-		UpdateSmoothedMovementDirection();
-		
-		// Apply gravity
-		// - extra power jump modifies gravity
-		// - controlledDescent mode modifies gravity
-		//ApplyGravity ();
-
-		// Apply jumping logic
-		//ApplyJumping ();
-		
-		// Calculate actual motion
-		Vector3 movement = moveDirection * moveSpeed + new Vector3(0, verticalSpeed, 0);// + inAirVelocity;
-		movement *= Time.deltaTime;
-		
-		// Move the controller
-		CharacterController controller = GetComponent<CharacterController>();
-		//collisionFlags = controller.Move(movement);
-		controller.Move(movement);
-
-		// ANIMATION sector
-		if (_animation) {
-			/*if (_characterState == CharacterState.Jumping) {
-				if (!jumpingReachedApex) {
-					_animation[jumpPoseAnimation.name].speed = jumpAnimationSpeed;
-					_animation[jumpPoseAnimation.name].wrapMode = WrapMode.ClampForever;
-					_animation.CrossFade(jumpPoseAnimation.name);
-				} else {
-					_animation[jumpPoseAnimation.name].speed = -landAnimationSpeed;
-					_animation[jumpPoseAnimation.name].wrapMode = WrapMode.ClampForever;
-					_animation.CrossFade(jumpPoseAnimation.name);               
-				}
-			} else {*/
-			/*	if (controller.velocity.sqrMagnitude < 0.1f) {
-					_animation.CrossFade(idleAnimation.name);
-				} else {
-					if (_characterState == CharacterState.Running) {
-						_animation[runAnimation.name].speed = Mathf.Clamp(controller.velocity.magnitude, 0.0f, runMaxAnimationSpeed);
-						_animation.CrossFade(runAnimation.name);    
-					} else if (_characterState == CharacterState.Trotting) {
-						_animation[walkAnimation.name].speed = Mathf.Clamp(controller.velocity.magnitude, 0.0f, trotMaxAnimationSpeed);
-						_animation.CrossFade(walkAnimation.name);   
-					} else if(_characterState == CharacterState.Walking) {
-						_animation[walkAnimation.name].speed = Mathf.Clamp(controller.velocity.magnitude, 0.0f, walkMaxAnimationSpeed);
-						_animation.CrossFade(walkAnimation.name);   
-					}
-				}*/
-			//}
-		}
-
-		// Set rotation to the move direction
-		transform.rotation = Quaternion.LookRotation(moveDirection);
-
-		// Send out direction, movement
-		if (directionChanged) {
-			Message toSentMessage = new Message(networkManager.GetUserID(), MessageParser.UPDATE_USER, transform.position, 
-			                                    v, h, 1, movement, transform.rotation);
-			networkManager.writeSocket (toSentMessage.toJsonString ());
-			Debug.Log ("Sent Message");
-			directionChanged = false; //Reset
-		}
+		// Reset walk time start when we slow down
+		if (moveSpeed < walkSpeed * 0.3f) {
+			walkTimeStart = Time.time;
+		}		
 	}
 	
 	float GetSpeed() {
@@ -350,19 +257,5 @@ public class MotorController : MonoBehaviour {
 
 	void Reset() {
 		gameObject.tag = "Player";
-	}
-
-	public bool isPaused() {
-		return paused;
-	}
-	
-	public void setPauseState(bool state) {
-		paused = state;
-	}
-
-	public void setInitParameter(Vector3 initPos, float initH, float initV) {
-		transform.position = initPos;
-		h = initH;
-		v = initV;
 	}
 }

@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 using System.Collections;
 using System.Net;
 using System.Text;
@@ -8,7 +9,7 @@ using System.IO;
 using System.Runtime.Serialization;
 using System;
 
-//using SimpleJSON;
+using MiniJSON;
 
 /**
  *  NetworkManager - a class that communicates with the game logic processing unit via 
@@ -46,7 +47,7 @@ public class NetworkManager : MonoBehaviour {
 		if (GUI.Button(new Rect(10, 110, 120, 20), "Read Message"))
 		{
 			// Print the received message
-			Message msg = receive();
+			/*Message msg = receive();
 
 			if(msg != null)
 			{
@@ -55,7 +56,7 @@ public class NetworkManager : MonoBehaviour {
 			else
 			{
 				Debug.Log("There are no more messages in the queue");
-			}
+			}*/
 		}
 		if (GUI.Button(new Rect(10, 90, 120, 20), "Send Message"))
 		{
@@ -63,10 +64,10 @@ public class NetworkManager : MonoBehaviour {
 			//string msg = "{\"Name\":\"test\", \"array\":[1,{\"data\":\"value\"}]}";
 			//string msg = "{\"Type\":\"test\", \"UserName\":5, \"VerticalDir\":1.5, \"HorizontalDir\":5.8, \"PosX\":3.0, \"PosY\":6.0, \"PosZ\":10.0}";
 			//Debug.Log ("msg test: " + msg);
-			Message m = new Message (mUserID, "test1", new Vector3 (1.54f, 4.37f, 10.59f), 5.0f, 10.0f, 34, new Vector3(2.34f, 3.45f, 4.56f), new Quaternion(1.11f, 2.22f, 3.33f, 4.44f));
-			Debug.Log ("real message str: " + m.toJsonString());
+			//Message m = new Message (mUserID, "test1", new Vector3 (1.54f, 4.37f, 10.59f), 5.0f, 10.0f, 34, new Vector3(2.34f, 3.45f, 4.56f), new Quaternion(1.11f, 2.22f, 3.33f, 4.44f));
+			//Debug.Log ("real message str: " + m.toJsonString());
 			//writeSocket(msg);
-			writeSocket(m.toJsonString());
+			//writeSocket(m.toJsonString());
 		}
 
 		if (GUI.Button(new Rect(10, 50, 160, 20), "Establish Connection"))
@@ -147,12 +148,11 @@ public class NetworkManager : MonoBehaviour {
 	}
 
 	// Send the message over the output stream of the established socket
-	public void writeSocket(string theLine) {
+	public void writeSocket(object v) {
 		if (!mSocketReady)
 			return;
-		String msg = theLine + "\r\n";
-		mWriter.Write(msg);
-		mWriter.Flush();
+		mWriter.Write(Json.Serialize(v));
+		//mWriter.Flush();
 		
 	}
 
@@ -165,27 +165,26 @@ public class NetworkManager : MonoBehaviour {
 		// More to be done in this loop?
 		// Like putting the message in queue?
 		while (true) {
-			string message = mReader.ReadLine();
+			//Message recved_msg = new Message(message);
+			//recved_msg.printMessage();
+			var N = Json.Deserialize(mReader.ReadLine());
 			Debug.Log ("recved message: " + message);
 
-			Message recved_msg = new Message(message);
-			//recved_msg.printMessage();
-
-			Debug.Log ("Enqueuing received message...");
-			mMsgQueue.Enqueue(recved_msg);
+			//Debug.Log ("Enqueuing received message...");
+			mMsgQueue.Enqueue(N);
 		}
 	}
 
 	// Dequeue the message received from the game logic, if any, and return it to the 
 	// caller
-	public Message receive()
+	public Dictionary<string, object> receive()
 	{
-		Message dq_msg = null;
+		Object dq_msg = null;
 
 		if(mMsgQueue.Count > 0)
 		{
 			Debug.Log("Dequeueing message....");
-			dq_msg = (Message) mMsgQueue.Dequeue();
+			dq_msg = mMsgQueue.Dequeue();
 		}
 
 		return dq_msg;

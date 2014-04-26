@@ -6,11 +6,12 @@ using System;
 public class Player : MonoBehaviour {
 
 	public GameObject motor;
+	private bool isLocal;
 	private float moveSpeed;
 
 	private string userId;
-	private float dirHorizontal;
-	private float dirVertical;
+	private float curHorizontalDir;
+	private float curVerticalDir;
 
 	private int lastLogicTime;
 	private float lastLocalTime;
@@ -20,14 +21,17 @@ public class Player : MonoBehaviour {
 
 	private List<GameObject> trailColliders;
 
-	public void SetStartState(GameObject prefab, float speed, string id, float h, float v, Vector3 startPos, 
-	                          int logicTime, float localTime) {
+	private List<OccuredEvent> processedMessage;
+
+	public void SetStartState(GameObject prefab, float speed, bool isLocalPlayer, string id, float h, float v, 
+	                          Vector3 startPos, int logicTime, float localTime) {
 		motor = prefab;
 		moveSpeed = speed;
+		isLocal = isLocalPlayer;
 
 		userId = id;
-		dirHorizontal = h;
-		dirVertical = v;
+		curHorizontalDir = h;
+		curVerticalDir = v;
 
 		lastPosition = startPos;
 		lastLogicTime = logicTime;
@@ -42,11 +46,11 @@ public class Player : MonoBehaviour {
 		lastRotation = motor.transform.rotation;
 	}
 	
-	public void UpdateLocally(float curLocalTime) {
+	public void UpdateBasedOnPrediction(int newLogicTime, float fixedDeltaTime) {
 		// Calculate movement
-		Vector3 moveDirection = new Vector3(dirHorizontal, 0, dirVertical);
+		Vector3 moveDirection = new Vector3(curHorizontalDir, 0, curVerticalDir);
 		moveDirection = transform.TransformDirection(moveDirection);
-		Vector3 movement = moveDirection * moveSpeed * (curLocalTime - lastLocalTime);
+		Vector3 movement = moveDirection * moveSpeed * fixedDeltaTime;
 
 		// Update player's position
 		Vector3 oldPos = motor.transform.position;
@@ -61,38 +65,29 @@ public class Player : MonoBehaviour {
 		// Update
 		lastPosition = oldPos;
 		lastMovement = movement;
-		lastLocalTime = curLocalTime;
 		lastRotation = motor.transform.rotation;
 	}
 
-	public void UpdateBasedOnNetwork(Vector3 pos, Vector3 movement, float h, float v,
-	                                 Quaternion rotation, int curLogicTime, float curLocalTime) {
-		// Update player's position
-		Vector3 oldPos = motor.transform.position;
-		motor.transform.position = oldPos + movement;
-
+	//public void UpdateBasedOnNetwork(Vector3 pos, Vector3 movement, float h, float v,
+	//                                 Quaternion rotation, int curLogicTime, float curLocalTime) {
+	public void UpdateBasedOnNetwork(float newHorizontalDir, float newVerticalDir, int newLogicTime, float fixedDeltaTime) {
 		// Update player's direction
-		dirVertical = v;
-		dirHorizontal = h;
+		curHorizontalDir = newHorizontalDir;
+		curVerticalDir = newVerticalDir;
+	
+		UpdateBasedOnPrediction(newLogicTime, fixedDeltaTime);
+	}
 
-		// Update player's rotation
-		Vector3 moveDirection = new Vector3(dirHorizontal, 0, dirVertical);
-		moveDirection = transform.TransformDirection(moveDirection);
-		motor.transform.rotation = Quaternion.LookRotation(moveDirection);
-
-		// Create invisible colliders in trail
-		CreateTrailCollider(oldPos);
-
-		// Update Logic Time
-		lastLogicTime = curLogicTime;
-		lastLocalTime = curLocalTime;
-		lastMovement = movement;
-		lastPosition = motor.transform.position;
+	public void SyncGlobalState(List<Dictionary<string, object>> passedGlobalStates) {
 	}
 
 	public void DestroyAllGameObject() {
 		DestroyPrefab();
 		DestroyAllColliders();
+	}
+
+	public bool isLocalPlayer() {
+		return isLocal;
 	}
 
 	private void CreateTrailCollider(Vector3 oldPos) {
