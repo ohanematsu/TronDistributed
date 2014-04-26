@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 using System.Collections;
 
 public class MotorController : MonoBehaviour {
@@ -54,7 +55,7 @@ public class MotorController : MonoBehaviour {
 	private Vector3 moveDirection = Vector3.zero;
 	
 	// The current vertical speed
-	private float verticalSpeed = 0.0F;
+	//private float verticalSpeed = 0.0F;
 	
 	// The current x-z move speed
 	private float moveSpeed = 0.0F;
@@ -72,7 +73,7 @@ public class MotorController : MonoBehaviour {
 
 	private GameStateManager gameStateManager;
 
-	private bool paused = true;
+	//private bool paused = true;
 
 	private bool directionChanged = false;
 
@@ -106,7 +107,7 @@ public class MotorController : MonoBehaviour {
 		gameObject.transform.position = invisiblePlace;
 
 		// Set initial state as paused
-		paused = true;
+		//paused = true;
 	}
 
 	public void SetGameStateManager(GameStateManager globalGameStateManager) {
@@ -143,9 +144,12 @@ public class MotorController : MonoBehaviour {
 		
 		// If direction changed, send UPDATE_USER message
 		if (directionChanged) {
-			Message toSentMessage = new Message(networkManager.GetUserID(), MessageDispatcher.UPDATE_USER, transform.position, 
-			                                    v, h, gameStateManager.GetCurLogicTime(), movement, transform.rotation);
-			networkManager.writeSocket(toSentMessage.toJsonString());
+			Dictionary<string, object> message = new Dictionary<string, object>();
+			message["honrizontalDir"] = curHorizontalDir;
+			message["verticalDir"] = curVerticalDir;
+			message["type"] = MessageDispatcher.UPDATE_USER;
+			message["time"] = gameStateManager.GetCurLogicTime();
+			gameStateManager.GetNetworkManager().writeSocket(message);
 			Debug.Log ("Sent Message");
 			directionChanged = false; //Reset
 		}
@@ -186,7 +190,7 @@ public class MotorController : MonoBehaviour {
 		}
 			
 		// Target direction relative to the camera
-		Vector3 targetDirection= h * right + v * forward;
+		Vector3 targetDirection= curHorizontalDir * right + curVerticalDir * forward;
 
 		// Lock camera for short period when transitioning moving & standing still
 		lockCameraTimer += Time.deltaTime;

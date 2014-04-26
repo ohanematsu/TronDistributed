@@ -53,6 +53,7 @@
      <Compile Include="Assets\Scripts\MainMenuControl.cs" />
      <Compile Include="Assets\Scripts\Message.cs" />
      <Compile Include="Assets\Scripts\MessageDispatcher.cs" />
+     <Compile Include="Assets\Scripts\MiniJSON.cs" />
      <Compile Include="Assets\Scripts\MotorController.cs" />
      <Compile Include="Assets\Scripts\NetworkManager.cs" />
      <Compile Include="Assets\Scripts\PlayHandler.cs" />

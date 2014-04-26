@@ -168,7 +168,7 @@ public class NetworkManager : MonoBehaviour {
 			//Message recved_msg = new Message(message);
 			//recved_msg.printMessage();
 			var N = Json.Deserialize(mReader.ReadLine());
-			Debug.Log ("recved message: " + message);
+			Debug.Log ("recved message: " + N);
 
 			//Debug.Log ("Enqueuing received message...");
 			mMsgQueue.Enqueue(N);
@@ -179,7 +179,7 @@ public class NetworkManager : MonoBehaviour {
 	// caller
 	public Dictionary<string, object> receive()
 	{
-		Object dq_msg = null;
+		object dq_msg = null;
 
 		if(mMsgQueue.Count > 0)
 		{
@@ -187,7 +187,7 @@ public class NetworkManager : MonoBehaviour {
 			dq_msg = mMsgQueue.Dequeue();
 		}
 
-		return dq_msg;
+		return dq_msg as Dictionary<string, object>;
 	}
 
 	// Close the connection

@@ -73,7 +73,7 @@ public class GameStateManager : MonoBehaviour {
 		curLogicTime++;
 	}
 
-	public void GetUserID() {
+	public string GetUserID() {
 		return userID;
 	}
 

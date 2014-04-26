@@ -73,8 +73,8 @@ public class MessageDispatcher : MonoBehaviour {
 		gameStateManager.GetNetworkManager().writeSocket(responseMessage);
 
 		// Generate ack message and send
-		Dictionary<string, object> ackeMessage = new Dictionary<string, object>();
-		// TODO: GET ALL USERS' CURRENT STATE AND SEND
+		Dictionary<string, object> ackeMessage = gameStateManager.GetPlayerManager().GenerateACKMessage();
+		gameStateManager.GetNetworkManager().writeSocket(ackeMessage);
 	}
 
 	private void HandleJoinGameACKMessage(Dictionary<string, object> message) {
@@ -143,9 +143,9 @@ public class MessageDispatcher : MonoBehaviour {
 		messageHandlerList.Add(JOIN_GAME,     HandleJoinGameMessage);
 		messageHandlerList.Add(JOIN_GAME_ACK, HandleJoinGameACKMessage);
 		messageHandlerList.Add(ADD_USER,      HandleAddUserMessage);
-		messageHandlerList.Add(ADD_LOCAL,     HandleAddLocalMessage);
+		//messageHandlerList.Add(ADD_LOCAL,     HandleAddLocalMessage);
 		messageHandlerList.Add(UPDATE_USER,   HandleUpdateUserMessage);
-		messageHandlerList.Add(UPDATE_LOCAL,  HandleUpdateLocalMessage);
+		//messageHandlerList.Add(UPDATE_LOCAL,  HandleUpdateLocalMessage);
 		messageHandlerList.Add(DELETE_USER,   HandleDeleteUserMessage);
 		messageHandlerList.Add(USER_CRASH,    HandleUserCrashMessage);
 		messageHandlerList.Add(PAUSE,         HandlePauseMessage);

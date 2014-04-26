@@ -6,44 +6,50 @@ using System;
 public class Player : MonoBehaviour {
 
 	public GameObject motor;
-	private bool isLocal;
+	//private bool isLocal;
 	private float moveSpeed;
 
 	private string userId;
+	private int initLogicTime;
+	private Vector3 initPosition;
+	private float initHorizontalDir;
+	private float initVerticalDir;
+
 	private float curHorizontalDir;
 	private float curVerticalDir;
-
-	private int lastLogicTime;
-	private float lastLocalTime;
-	private Vector3 lastPosition;
-	private Vector3 lastMovement;
-	private Quaternion lastRotation;
+	//private float lastLocalTime;
+	//private Vector3 lastMovement;
+	//private Quaternion lastRotation;
 
 	private List<GameObject> trailColliders;
+	private List<Dictionary<string, object>> processedMessage;
 
-	private List<OccuredEvent> processedMessage;
-
-	public void SetStartState(GameObject prefab, float speed, bool isLocalPlayer, string id, float h, float v, 
-	                          Vector3 startPos, int logicTime, float localTime) {
+	public void SetStartState(GameObject prefab, float speed, Dictionary<string, object> addUserMessage) {
 		motor = prefab;
 		moveSpeed = speed;
-		isLocal = isLocalPlayer;
 
-		userId = id;
-		curHorizontalDir = h;
-		curVerticalDir = v;
+		userId = addUserMessage["userID"] as string;
+		initHorizontalDir = (float)(double)addUserMessage["horizontalDir"];
+		initVerticalDir = (float)(double)addUserMessage["verticalDir"];
+		initLogicTime = (int)addUserMessage["time"];
 
-		lastPosition = startPos;
-		lastLogicTime = logicTime;
-		lastLocalTime = localTime;
-		lastMovement = new Vector3 (0, 0, 0);
+		float initPosX = (float)(double)addUserMessage["posX"];
+		float initPosY = (float)(double)addUserMessage["posY"];
+		float initPosZ = (float)(double)addUserMessage["posZ"];
+		initPosition = new Vector3(initPosX, initPosY, initPosZ);
+
+		curHorizontalDir = initHorizontalDir;
+		curVerticalDir = initVerticalDir;
 
 		trailColliders = new List<GameObject>();
+		processedMessage = new List<Dictionary<string, object>>();
+		processedMessage.Add(addUserMessage);
 
-		Vector3 moveDirection = new Vector3(dirHorizontal, 0, dirVertical);
+		// Set position and rotation
+		motor.transform.position = initPosition;
+		Vector3 moveDirection = new Vector3(curHorizontalDir, 0, curVerticalDir);
 		moveDirection = transform.TransformDirection(moveDirection);
 		motor.transform.rotation = Quaternion.LookRotation(moveDirection);
-		lastRotation = motor.transform.rotation;
 	}
 	
 	public void UpdateBasedOnPrediction(int newLogicTime, float fixedDeltaTime) {
@@ -62,32 +68,36 @@ public class Player : MonoBehaviour {
 		// Create invisible colliders in trail
 		CreateTrailCollider(oldPos);
 
-		// Update
-		lastPosition = oldPos;
-		lastMovement = movement;
-		lastRotation = motor.transform.rotation;
+		// Store Message
+		Dictionary<string, object> message = new Dictionary<string, object>();
+		message["type"] = (object)MessageDispatcher.UPDATE_USER;
+		message["verticalDir"] = (object)curVerticalDir;
+		message["horizontalDir"] = (object)curHorizontalDir;
+		message["time"] = (object)newLogicTime;
+		processedMessage.Add(message);
 	}
 
-	//public void UpdateBasedOnNetwork(Vector3 pos, Vector3 movement, float h, float v,
-	//                                 Quaternion rotation, int curLogicTime, float curLocalTime) {
-	public void UpdateBasedOnNetwork(float newHorizontalDir, float newVerticalDir, int newLogicTime, float fixedDeltaTime) {
+	public void UpdateBasedOnNetwork(Dictionary<string, object> message, float fixedDeltaTime) {
+		// Parse message
+		float newHorizontalDir = (float)(double)message["horizontalDir"];
+		float newVerticalDir = (float)(double)message["verticalDir"];
+		int newLogicTime = (int)message["time"];
+
 		// Update player's direction
 		curHorizontalDir = newHorizontalDir;
 		curVerticalDir = newVerticalDir;
 	
+		// Update position and rotation
 		UpdateBasedOnPrediction(newLogicTime, fixedDeltaTime);
 	}
 
-	public void SyncGlobalState(List<Dictionary<string, object>> passedGlobalStates) {
+	public List<Dictionary<string, object>> GetProcessedMessage() {
+		return processedMessage;
 	}
 
 	public void DestroyAllGameObject() {
 		DestroyPrefab();
 		DestroyAllColliders();
-	}
-
-	public bool isLocalPlayer() {
-		return isLocal;
 	}
 
 	private void CreateTrailCollider(Vector3 oldPos) {
