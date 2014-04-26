@@ -152,7 +152,7 @@ public class NetworkManager : MonoBehaviour {
 		if (!mSocketReady)
 			return;
 		mWriter.Write(Json.Serialize(v));
-		//mWriter.Flush();
+		mWriter.Flush();
 		
 	}
 
@@ -168,6 +168,7 @@ public class NetworkManager : MonoBehaviour {
 			//Message recved_msg = new Message(message);
 			//recved_msg.printMessage();
 			var N = Json.Deserialize(mReader.ReadLine());
+			if (N == null) continue;
 			Debug.Log ("recved message: " + N);
 
 			//Debug.Log ("Enqueuing received message...");
