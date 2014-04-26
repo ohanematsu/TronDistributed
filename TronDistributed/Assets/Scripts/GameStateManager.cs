@@ -29,7 +29,7 @@ public class GameStateManager : MonoBehaviour {
 
 	void FixedUpdate() {
 		if (!paused) {
-			// Detect keyboard event
+			// Detect keyboard event and send message to its own playermanager
 			float verticalDir = Input.GetAxisRaw("Vertical");   
 			float horizontalDir = Input.GetAxisRaw("Horizontal");
 			Dictionary<string, object> message = new Dictionary<string, object>();
@@ -94,6 +94,7 @@ public class GameStateManager : MonoBehaviour {
 			// TODO:Show something and then quit
 			Application.LoadLevel(2);
 		}
+		Debug.Log("Set up NetworkManager success!");
 	}
 
 	private void InitPlayerManager() {
@@ -116,8 +117,8 @@ public class GameStateManager : MonoBehaviour {
 			// TODO:Show something and then quit
 			Application.LoadLevel(2);
 		}
-		Debug.Log("Get MessageDispatcher success");
 		messageDispatcher.SetGameStateManager(this);
+		Debug.Log("Get MessageDispatcher success");
 	}
 
 	private void InitMotorController() {
@@ -128,8 +129,8 @@ public class GameStateManager : MonoBehaviour {
 			// TODO:Show something and then quit
 			Application.LoadLevel(2);
 		}
-		Debug.Log("Get motorController success");
 		motorController.SetGameStateManager(this);
+		Debug.Log("Get motorController success");
 	}
 
 	private void InitGlobalValues() {

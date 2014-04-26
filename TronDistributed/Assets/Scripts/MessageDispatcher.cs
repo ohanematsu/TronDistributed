@@ -64,12 +64,12 @@ public class MessageDispatcher : MonoBehaviour {
 		// Generate response message and send
 		Dictionary<string, object> responseMessage = new Dictionary<string, object>();
 		responseMessage.Add("userID", gameStateManager.GetUserID());
-		responseMessage.Add ("type", JOIN_USER_RESPONSE);
-		responseMessage.Add ("posX", startPos.x);
-		responseMessage.Add ("posY", startPos.y);
-		responseMessage.Add ("posZ", startPos.x);
-		responseMessage.Add ("honrizontalDir", h);
-		responseMessage.Add ("verticalDir", v);
+		responseMessage.Add("type", JOIN_USER_RESPONSE);
+		responseMessage.Add("posX", startPos.x);
+		responseMessage.Add("posY", startPos.y);
+		responseMessage.Add("posZ", startPos.x);
+		responseMessage.Add("honrizontalDir", h);
+		responseMessage.Add("verticalDir", v);
 		gameStateManager.GetNetworkManager().writeSocket(responseMessage);
 
 		// Generate ack message and send
