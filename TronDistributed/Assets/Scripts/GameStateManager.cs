@@ -14,6 +14,7 @@ public class GameStateManager : MonoBehaviour {
 	private bool paused;
 	private bool receiveMsg;
 	private float moveSpeed;
+	private float timeInterval;
 
 	private int state;
 	public static int NORMAL = 0;
@@ -112,6 +113,10 @@ public class GameStateManager : MonoBehaviour {
 		state = newState;
 	}
 
+	public float GetTimeInterval() {
+		return timeInterval;
+	}
+
 	private void InitNetworkManager() {
 		// Get NetworkManager component
 		networkManager = gameObject.GetComponent<NetworkManager>();
@@ -181,6 +186,8 @@ public class GameStateManager : MonoBehaviour {
 		moveSpeed = 2.0f;
 
 		state = NORMAL;
+
+		timeInterval = 0.02f;
 
 		// Initiate pause state
 		setPauseState(true);

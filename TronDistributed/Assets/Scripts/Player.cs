@@ -74,12 +74,12 @@ public class Player {
 		CreateTrailCollider(oldPos);
 
 		// Store Message
-		Dictionary<string, object> message = new Dictionary<string, object>();
+		/*Dictionary<string, object> message = new Dictionary<string, object>();
 		message["type"] = (object)MessageDispatcher.UPDATE_USER;
 		message["verticalDir"] = (object)curVerticalDir;
 		message["horizontalDir"] = (object)curHorizontalDir;
 		message["time"] = (object)newLogicTime;
-		processedMessage.Add(message);
+		processedMessage.Add(message);*/
 	}
 
 	public void UpdateBasedOnNetwork(Dictionary<string, object> message, float fixedDeltaTime) {

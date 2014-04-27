@@ -53,9 +53,12 @@ public class PlayerManager : MonoBehaviour{
 
 	public void SyncGlobalGameState(Dictionary<string, object> message) {
 		Dictionary<string, object> passedAllUsersGlobalStates = message["globalState"] as Dictionary<string, object>;
+		Debug.Log("Number of user: " + passedAllUsersGlobalStates.Count);
+
 		foreach (KeyValuePair<string, object> pair in passedAllUsersGlobalStates) {
 			string userID = pair.Key as string;
 			List<Dictionary<string, object>> messages = pair.Value as List<Dictionary<string, object>>;
+			int curLogicTime = 0;
 			foreach (Dictionary<string, object> processedMessage in messages) {
 				Dispatch(processedMessage);
 
@@ -63,9 +66,23 @@ public class PlayerManager : MonoBehaviour{
 				Debug.Log("Quickly update user: " + userID);
 				if (!Players.ContainsKey(userID)) {
 					Debug.Log("user " + userID + "doesnt exsits");
+					continue;
 				}
-				// TODO : UPDATE POSITION
+				string type = processedMessage["type"] as String;
+				if (type == MessageDispatcher.ADD_USER) {
+					Debug.Log("Fast processed ADD_USER message");
+					curLogicTime = Convert.ToInt32(processedMessage["time"]);
+				} else {
+					Debug.Log("Fast processed UPDATE message");
+					int newLogicTime = Convert.ToInt32(processedMessage["time"]);
+					Players[userID].UpdateBasedOnPrediction(newLogicTime, 
+					    gameStateManager.GetTimeInterval() * (newLogicTime - curLogicTime));
+					curLogicTime = newLogicTime;
+				}
 			}
+
+			Players[userID].UpdateBasedOnPrediction(gameStateManager.GetCurLogicTime(), 
+				gameStateManager.GetTimeInterval() * (gameStateManager.GetCurLogicTime() - curLogicTime));
 		}
 
 		gameStateManager.SetCurLogicTime(Convert.ToInt32(message["time"]));
@@ -114,6 +131,7 @@ public class PlayerManager : MonoBehaviour{
 		Player newPlayer = new Player();
 		newPlayer.SetStartState(new GameObject(), otherPlayerSpeed, message);
 		Players.Add(gameStateManager.GetUserID(), newPlayer);
+		newPlayer.GetProcessedMessage().Add(message);
 		Debug.Log("Init local user complete");
 
 		// Enable update
@@ -147,6 +165,7 @@ public class PlayerManager : MonoBehaviour{
 		Player newPlayer = new Player();
 		newPlayer.SetStartState(playerPrefab, gameStateManager.getMoveSpeed(), message);
 		Players.Add(userID, newPlayer);
+		newPlayer.GetProcessedMessage().Add(message);
 		Debug.Log("Initate player " + userID + " complete");
 	}
 
@@ -186,6 +205,7 @@ public class PlayerManager : MonoBehaviour{
 		Debug.Log("Prepare to update remote player");
 		// Update remote player
 		Players[userID].UpdateBasedOnNetwork(message, Time.fixedDeltaTime);
+		Players[userID].GetProcessedMessage().Add(message);
 		Debug.Log("Update remote player complete");
 	}
 
