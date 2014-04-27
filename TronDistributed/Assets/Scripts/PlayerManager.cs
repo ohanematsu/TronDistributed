@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
+using System;
 
 // This class contains all players in the game, include itself
 public class PlayerManager : MonoBehaviour{
@@ -83,13 +84,13 @@ public class PlayerManager : MonoBehaviour{
 	private void InitLocalPlayer(Dictionary<string, object> message) {
 		Debug.Log("Prepare to init local user");
 
-		float initPosX = (float)(double)message["posX"];
-		float initPosY = (float)(double)message["posY"];
-		float initPosZ = (float)(double)message["posZ"];
+		float initPosX = Convert.ToSingle(message["posX"]);
+		float initPosY = Convert.ToSingle(message["posY"]);
+		float initPosZ = Convert.ToSingle(message["posZ"]);
 		Vector3 initPosition = new Vector3(initPosX, initPosY, initPosZ);
 
-		float initHorizontalDir = (float)(int)message["horizontalDir"];
-		float initVerticalDir = (float)(int)message["verticalDir"];
+		float initHorizontalDir = Convert.ToSingle(message["horizontalDir"]);
+		float initVerticalDir = Convert.ToSingle(message["verticalDir"]);
 
 		// Initiate start position and direction
 		gameStateManager.GetMotorController().SetInitParameters(initPosition, initHorizontalDir, initVerticalDir);
@@ -110,9 +111,9 @@ public class PlayerManager : MonoBehaviour{
 	private void InitRemotePlayer(string userID, Dictionary<string, object> message) {
 		Debug.Log("Prepare to init remote user");
 
-		float initPosX = (float)(double)message["posX"];
-		float initPosY = (float)(double)message["posY"];
-		float initPosZ = (float)(double)message["posZ"];
+		float initPosX = Convert.ToSingle(message["posX"]);
+		float initPosY = Convert.ToSingle(message["posY"]);
+		float initPosZ = Convert.ToSingle(message["posZ"]);
 		Vector3 initPosition = new Vector3(initPosX, initPosY, initPosZ);
 
 		// Instantiate prefabs
@@ -149,9 +150,9 @@ public class PlayerManager : MonoBehaviour{
 		Debug.Log("Prepare to update local player");
 
 		// Parse message
-		float horizontalDir = (float)(double)message["horizontalDir"];
-		float verticalDir = (float)(double)message["verticalDir"];
-		int curLogicTime = (int)message["time"];
+		float horizontalDir = Convert.ToSingle(message["horizontalDir"]);
+		float verticalDir = Convert.ToSingle(message["verticalDir"]);
+		int curLogicTime = Convert.ToInt32(message["time"]);
 		
 		// Update local player
 		gameStateManager.GetMotorController().UpdateMotor(horizontalDir, verticalDir, Time.fixedDeltaTime);

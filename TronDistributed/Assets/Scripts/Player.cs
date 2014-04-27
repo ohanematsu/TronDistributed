@@ -29,13 +29,13 @@ public class Player {
 		moveSpeed = speed;
 
 		userId = addUserMessage["userID"] as string;
-		initHorizontalDir = (float)(double)addUserMessage["horizontalDir"];
-		initVerticalDir = (float)(double)addUserMessage["verticalDir"];
-		initLogicTime = (int)addUserMessage["time"];
+		initHorizontalDir = Convert.ToSingle(addUserMessage["horizontalDir"]);
+		initVerticalDir = Convert.ToSingle(addUserMessage["verticalDir"]);
+		initLogicTime = Convert.ToInt32(addUserMessage["time"]);
 
-		float initPosX = (float)(double)addUserMessage["posX"];
-		float initPosY = (float)(double)addUserMessage["posY"];
-		float initPosZ = (float)(double)addUserMessage["posZ"];
+		float initPosX = Convert.ToSingle(addUserMessage["posX"]);
+		float initPosY = Convert.ToSingle(addUserMessage["posY"]);
+		float initPosZ = Convert.ToSingle(addUserMessage["posZ"]);
 		initPosition = new Vector3(initPosX, initPosY, initPosZ);
 
 		curHorizontalDir = initHorizontalDir;
@@ -79,9 +79,9 @@ public class Player {
 
 	public void UpdateBasedOnNetwork(Dictionary<string, object> message, float fixedDeltaTime) {
 		// Parse message
-		float newHorizontalDir = (float)(double)message["horizontalDir"];
-		float newVerticalDir = (float)(double)message["verticalDir"];
-		int newLogicTime = (int)message["time"];
+		float newHorizontalDir = Convert.ToSingle(message["horizontalDir"]);
+		float newVerticalDir = Convert.ToSingle(message["verticalDir"]);
+		int newLogicTime = Convert.ToInt32(message["time"]);
 
 		// Update player's direction
 		curHorizontalDir = newHorizontalDir;
