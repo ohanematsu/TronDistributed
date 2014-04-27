@@ -13,6 +13,7 @@ public class GameStateManager : MonoBehaviour {
 	private string userID;
 	private bool paused;
 	private bool receiveMsg;
+	private float moveSpeed;
 
 	void Start() {
 		// Get all components
@@ -161,6 +162,12 @@ public class GameStateManager : MonoBehaviour {
 
 		// Initiate pause state
 		//setPauseState(true);
+
+		moveSpeed = 2.0f;
+	}
+
+	public float getMoveSpeed() {
+		return moveSpeed;
 	}
 
 	private void SendJoinGameMessage() {

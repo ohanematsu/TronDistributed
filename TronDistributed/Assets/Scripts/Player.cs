@@ -27,6 +27,7 @@ public class Player {
 	public void SetStartState(GameObject prefab, float speed, Dictionary<string, object> addUserMessage) {
 		motor = prefab;
 		moveSpeed = speed;
+		Debug.Log("Init remote speed = " + moveSpeed);
 
 		userId = addUserMessage["userID"] as string;
 		initHorizontalDir = Convert.ToSingle(addUserMessage["horizontalDir"]);
@@ -48,7 +49,7 @@ public class Player {
 		// Set position and rotation
 		motor.transform.position = initPosition;
 		Vector3 moveDirection = new Vector3(curHorizontalDir, 0, curVerticalDir);
-		moveDirection = motor.transform.TransformDirection(moveDirection);
+		//moveDirection = motor.transform.TransformDirection(moveDirection);
 		motor.transform.rotation = Quaternion.LookRotation(moveDirection);
 	}
 	

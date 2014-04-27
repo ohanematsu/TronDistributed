@@ -144,9 +144,9 @@ public class MotorController : MonoBehaviour {
 		Vector3 moveDirection = new Vector3(curHorizontalDir, 0, curVerticalDir);
 		//moveDirection = moveDirection.normalized;
 		//moveDirection = transform.TransformDirection(moveDirection);
-		Vector3 movement = moveDirection * moveSpeed;
+		Vector3 movement = moveDirection * gameStateManager.getMoveSpeed();
 		movement *= fixedDeltaTime;
-		Debug.Log("Local Movement: " + movement.x + "," + movement.y + "," + movement.z + ", speed = " + moveSpeed);
+		Debug.Log("Local Movement: " + movement.x + "," + movement.y + "," + movement.z + ", speed = " + gameStateManager.getMoveSpeed());
 		
 		// Move the controller
 		CharacterController controller = GetComponent<CharacterController>();

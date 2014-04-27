@@ -129,7 +129,7 @@ public class PlayerManager : MonoBehaviour{
 		// Create player
 		//float curTime = Time.time;
 		Player newPlayer = new Player();
-		newPlayer.SetStartState(playerPrefab, otherPlayerSpeed, message);
+		newPlayer.SetStartState(playerPrefab, gameStateManager.getMoveSpeed(), message);
 		Players.Add(userID, newPlayer);
 		Debug.Log("Initate player " + userID + " complete");
 	}
@@ -254,7 +254,7 @@ public class PlayerManager : MonoBehaviour{
 			// Update the player
 			Debug.Log("user id: " + pair.Key);
 			if (pair.Key != gameStateManager.GetUserID()) {
-				pair.Value.UpdateBasedOnPrediction(gameStateManager.GetCurLogicTime(), Time.fixedTime);
+				pair.Value.UpdateBasedOnPrediction(gameStateManager.GetCurLogicTime(), Time.fixedDeltaTime);
 			} else {
 				gameStateManager.GetMotorController().UpdateMotor(Time.fixedDeltaTime);
 			}
