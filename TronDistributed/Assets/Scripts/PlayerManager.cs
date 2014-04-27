@@ -62,7 +62,9 @@ public class PlayerManager : MonoBehaviour{
 		}
 
 		gameStateManager.SetCurLogicTime(Convert.ToInt32(message["time"]));
+		Debug.Log("After receiving JOIN_ACK, time is " + gameStateManager.GetCurLogicTime ());
 		gameStateManager.setState(GameStateManager.WAIT_FOR_ADD_LOCAL);
+		Debug.Log("After receiving JOIN_ACK, state is " + gameStateManager.GetState ());
 	}
 
 	//public bool AddNewPlayer(string id, Vector3 startPos, float h, float v, Quaternion startRotation, int logicTime) {
@@ -108,6 +110,7 @@ public class PlayerManager : MonoBehaviour{
 		Debug.Log("Init local user complete");
 
 		// Enable update
+		Debug.Log("After receiving ADD_USER, state is " + gameStateManager.GetState());
 		if (gameStateManager.GetState() == GameStateManager.WAIT_FOR_ADD_LOCAL) {
 			gameStateManager.setState(GameStateManager.NORMAL);
 			gameStateManager.setPauseState(false);
@@ -240,8 +243,8 @@ public class PlayerManager : MonoBehaviour{
 	
 	// Called every fixed framerate frame, if the MonoBehaviour is enabled.
 	void FixedUpdate () {
-	
-		if (paused) {
+
+		if (paused && gameStateManager.GetState() == GameStateManager.NORMAL ) {
 			return ;
 		}
 		
