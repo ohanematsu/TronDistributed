@@ -60,7 +60,7 @@ public class Player {
 		//moveDirection = motor.transform.TransformDirection(moveDirection);
 		Vector3 movement = moveDirection * moveSpeed * fixedDeltaTime;
 
-		Debug.Log("Movement: " + movement.x + "," + movement.y + "," + movement.z);
+		Debug.Log("Remote Movement: " + movement.x + "," + movement.y + "," + movement.z + ", speed = " + moveSpeed);
 
 		// Update player's position
 		Vector3 oldPos = motor.transform.position;

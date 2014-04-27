@@ -58,7 +58,7 @@ public class MotorController : MonoBehaviour {
 	//private float verticalSpeed = 0.0F;
 	
 	// The current x-z move speed
-	private float moveSpeed = 0.0F;
+	private float moveSpeed = 4.0f;
 
 	// Are we moving backwards (This locks the camera to not do a 180 degree spin)
 	private bool movingBack = false;
@@ -116,7 +116,7 @@ public class MotorController : MonoBehaviour {
 	public void SetInitParameters(Vector3 initPos, float initHorizontalDir, float initVerticalDir) {
 		gameObject.transform.position = initPos;
 		UpdateDirection(initHorizontalDir, initVerticalDir);
-		UpdateSmoothedMovementDirection();
+		//UpdateSmoothedMovementDirection();
 		transform.rotation = Quaternion.LookRotation(moveDirection);
 	}
 
@@ -146,7 +146,7 @@ public class MotorController : MonoBehaviour {
 		//moveDirection = transform.TransformDirection(moveDirection);
 		Vector3 movement = moveDirection * moveSpeed;
 		movement *= fixedDeltaTime;
-
+		Debug.Log("Local Movement: " + movement.x + "," + movement.y + "," + movement.z + ", speed = " + moveSpeed);
 		
 		// Move the controller
 		CharacterController controller = GetComponent<CharacterController>();

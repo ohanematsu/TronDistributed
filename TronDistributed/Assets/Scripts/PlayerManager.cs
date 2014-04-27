@@ -17,7 +17,7 @@ public class PlayerManager : MonoBehaviour{
 	private delegate void messageHandler(Dictionary<string, object> message);
 	private static Dictionary<string, messageHandler> messageHandlerList = new Dictionary<string, messageHandler>();
 
-	public float otherPlayerSpeed = 20;
+	public float otherPlayerSpeed = 4.0f;
 	private bool paused = false;
 
 	public void SetGameStateManager(GameStateManager globalGameStateManager) {
