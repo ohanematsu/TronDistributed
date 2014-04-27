@@ -88,8 +88,8 @@ public class PlayerManager : MonoBehaviour{
 		float initPosZ = (float)(double)message["posZ"];
 		Vector3 initPosition = new Vector3(initPosX, initPosY, initPosZ);
 
-		float initHorizontalDir = (float)(double)message["horizontalDir"];
-		float initVerticalDir = (float)(double)message["verticalDir"];
+		float initHorizontalDir = (float)(int)message["horizontalDir"];
+		float initVerticalDir = (float)(int)message["verticalDir"];
 
 		// Initiate start position and direction
 		gameStateManager.GetMotorController().SetInitParameters(initPosition, initHorizontalDir, initVerticalDir);
