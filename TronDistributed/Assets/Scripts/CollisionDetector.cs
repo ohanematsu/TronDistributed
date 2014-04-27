@@ -9,7 +9,14 @@ public class CollisionDetector : MonoBehaviour {
 			return ;
 		}
 		Debug.Log(hit.gameObject.tag);
-		Debug.Log("Collide Something！");
+		string debugInfo = "Collide Something! ";
+		debugInfo += "Position: " + hit.gameObject.transform.position.x + ", " + hit.gameObject.transform.position.y +
+						", " + hit.gameObject.transform.position.z;
+		BoxCollider collider = hit.gameObject.GetComponent<BoxCollider>();
+		if (collider != null) {
+			debugInfo += "Size: " + collider.size.x + ", " + collider.size.y + ", " + collider.size.z;
+		}
+		Debug.Log(debugInfo);
 
 		// Initiate the connection. If failed, show something and quit
 		NetworkManager networkManager = gameObject.GetComponent<NetworkManager>();

@@ -60,6 +60,9 @@ public class PlayerManager : MonoBehaviour{
 				Dispatch(processedMessage);
 			}
 		}
+
+		gameStateManager.SetCurLogicTime(Convert.ToInt32(message["time"]));
+		gameStateManager.setState(GameStateManager.WAIT_FOR_ADD_LOCAL);
 	}
 
 	//public bool AddNewPlayer(string id, Vector3 startPos, float h, float v, Quaternion startRotation, int logicTime) {
@@ -105,8 +108,11 @@ public class PlayerManager : MonoBehaviour{
 		Debug.Log("Init local user complete");
 
 		// Enable update
-		gameStateManager.setPauseState(false);
-		Debug.Log("Enable update");
+		if (gameStateManager.GetState() == GameStateManager.WAIT_FOR_ADD_LOCAL) {
+			gameStateManager.setState(GameStateManager.NORMAL);
+			gameStateManager.setPauseState(false);
+			Debug.Log("Enable update");
+		}
 	}
 
 	private void InitRemotePlayer(string userID, Dictionary<string, object> message) {
@@ -234,10 +240,10 @@ public class PlayerManager : MonoBehaviour{
 	
 	// Called every fixed framerate frame, if the MonoBehaviour is enabled.
 	void FixedUpdate () {
-		/*
+	
 		if (paused) {
 			return ;
-		}*/
+		}
 		
 		// Process message of known players
 		foreach(KeyValuePair<string, Player> pair in Players) {

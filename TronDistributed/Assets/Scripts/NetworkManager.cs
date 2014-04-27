@@ -88,17 +88,10 @@ public class NetworkManager : MonoBehaviour {
 	void Start() 
 	{
 		// Dummy function
-		/*IPHostEntry host;
-		host = Dns.GetHostEntry (Dns.GetHostName ());
-		foreach (IPAddress ip in host.AddressList) {
-			if (ip.AddressFamily == AddressFamily.InterNetwork) {
-				mIpAddr = ip.ToString();
-				break;
-			}
-		}*/
+		mIpAddr = LocalIPAddress();
 
 		// May there are other stuffs that need to be initialized?
-		mUserID = mIpAddr + ":" + mPort.ToString();
+		mUserID = mIpAddr + ":18842";
 	}
 
 	// This is where the socket is setup and the connthread is established
@@ -209,5 +202,47 @@ public class NetworkManager : MonoBehaviour {
 
 	public string GetUserID() {
 		return mUserID;
+	}
+
+	public string LocalIPAddress()
+	{
+		IPHostEntry host;
+		string localIP = "";
+		
+		/* Use TCP socket connection to retrieve local IP address */
+		TcpClient tron_server_sock = new TcpClient("team18.ece842.com", 80);
+		localIP = ((IPEndPoint)tron_server_sock.Client.LocalEndPoint).Address.ToString ();
+		
+		Debug.Log ("localIP: " + localIP);
+		
+		if (tron_server_sock.Connected) 
+		{
+			tron_server_sock.Close();
+			Debug.Log ("tron_server_sock closed");
+		}
+		
+		/* Use DNS to resolve for local IP address if localIP is 127.0.0.1 */
+		if (localIP.Equals ("127.0.0.1")) 
+		{
+			Debug.Log("localIp is 127.0.0.1!!!");
+			
+			Debug.Log ("Using Dns.GetHostByName()....");
+			//host = Dns.GetHostByName(Dns.GetHostName());
+			host = Dns.GetHostEntry(Dns.GetHostName());
+			Debug.Log ("Dns.GetHostName(): " + Dns.GetHostName ());
+			foreach (IPAddress ip in host.AddressList)
+			{
+				Debug.Log("ip addr: " + ip.ToString());
+				if (ip.AddressFamily == AddressFamily.InterNetwork)
+				{
+					Debug.Log("InterNetwork ip addr: " + ip.ToString());
+					localIP = ip.ToString();
+					break;
+				}
+			}
+			
+		}
+		
+		return localIP;
 	}
 }

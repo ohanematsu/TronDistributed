@@ -43,6 +43,9 @@ public class MessageDispatcher : MonoBehaviour {
 
 		SendAddUserMessage(gameStateManager.GetUserID());
 		SendAddUserMessage(targetUserID);
+
+		// Enable Clock
+		gameStateManager.setPauseState(false);
 	}
 
 	private void SendAddUserMessage(string userID) {

@@ -15,6 +15,10 @@ public class GameStateManager : MonoBehaviour {
 	private bool receiveMsg;
 	private float moveSpeed;
 
+	private int state;
+	public static int NORMAL = 0;
+	public static int WAIT_FOR_ADD_LOCAL = 1;
+
 	void Start() {
 		// Get all components
 		InitNetworkManager();
@@ -48,7 +52,7 @@ public class GameStateManager : MonoBehaviour {
 
 		if (!paused) {
 			IncrementCurLogicTime();
-			
+
 			// Detect keyboard event and send message to its own playermanager
 			float verticalDir = Input.GetAxisRaw("Vertical");   
 			float horizontalDir = Input.GetAxisRaw("Horizontal");
@@ -87,12 +91,24 @@ public class GameStateManager : MonoBehaviour {
 		return curLogicTime;
 	}
 
+	public void SetCurLogicTime(int time) {
+		curLogicTime = time;
+	}
+
 	public void IncrementCurLogicTime() {
 		curLogicTime++;
 	}
 
 	public string GetUserID() {
 		return userID;
+	}
+
+	public int GetState() {
+		return state;
+	}
+
+	public void setState(int newState) {
+		state = newState;
 	}
 
 	private void InitNetworkManager() {
@@ -160,10 +176,13 @@ public class GameStateManager : MonoBehaviour {
 		// Initiate user ID
 		userID = networkManager.GetUserID();
 
-		// Initiate pause state
-		//setPauseState(true);
-
+		// Initiate moveSpeed 
 		moveSpeed = 2.0f;
+
+		state = NORMAL;
+
+		// Initiate pause state
+		setPauseState(true);
 	}
 
 	public float getMoveSpeed() {
@@ -180,7 +199,7 @@ public class GameStateManager : MonoBehaviour {
 		Debug.Log("Send JOIN_GAME message");
 
 		// Set state to paused to wait for response
-		//setPauseState(true);
+		setPauseState(true);
 	}
 
 	public void setPauseState(bool state) {
