@@ -226,11 +226,14 @@ public class PlayerManager : MonoBehaviour{
 		}*/
 		
 		// Process message of known players
+
+		Dictionary<string, List<Dictionary<string, object>>> cloneKnownPlayerUnProcessedMsgList = 
+			new Dictionary<string, List<Dictionary<string, object>>>(knownPlayerUnProcessedMsgList);
 		foreach (KeyValuePair<string, Player> pair in Players) {
 			// If this player has unprocessed messages, process them first
 			if (knownPlayerUnProcessedMsgList[pair.Key].Count != 0) {
 				Debug.Log("Dispatch message for user" + pair.Key);
-				foreach (Dictionary<string, object> msg in knownPlayerUnProcessedMsgList[pair.Key]) {
+				foreach (Dictionary<string, object> msg in cloneKnownPlayerUnProcessedMsgList[pair.Key]) {
 					Dispatch(msg);
 					knownPlayerUnProcessedMsgList[pair.Key].Remove(msg);
 				}
@@ -241,9 +244,11 @@ public class PlayerManager : MonoBehaviour{
 				pair.Value.UpdateBasedOnPrediction(gameStateManager.GetCurLogicTime(), Time.fixedTime);
 			}
 		}
-		
+
+		List<Dictionary<string, object>> cloneUnknownPlayerUnProcessedMsgList = 
+			new List<Dictionary<string, object>>(unknownPlayerUnProcessedMsgList);
 		// Process messages for unknown players
-		foreach (Dictionary<string, object> msg in unknownPlayerUnProcessedMsgList) {
+		foreach (Dictionary<string, object> msg in cloneUnknownPlayerUnProcessedMsgList) {
 			Dispatch(msg);
 			unknownPlayerUnProcessedMsgList.Remove(msg);
 		}

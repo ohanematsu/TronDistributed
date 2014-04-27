@@ -104,7 +104,7 @@ public class MotorController : MonoBehaviour {
 		}
 	
 		// Set initial position is invisible to the player
-		//gameObject.transform.position = invisiblePlace;
+		//gameObject.transform.position = new Vector3(Random.Range(1.0f, 63.0f), 1.1f, Random.Range(1.0f, 63.0f));
 
 		// Set initial state as paused
 		//paused = true;
@@ -112,6 +112,7 @@ public class MotorController : MonoBehaviour {
 
 	public void SetGameStateManager(GameStateManager globalGameStateManager) {
 		gameStateManager = globalGameStateManager;
+		//gameStateManager.setPauseState(false);
 	}
 
 	public void SetInitParameters(Vector3 initPos, float initHorizontalDir, float initVerticalDir) {

@@ -41,6 +41,11 @@ public class MessageDispatcher : MonoBehaviour {
 		Dictionary<string, object> ackeMessage = gameStateManager.GetPlayerManager().GenerateACKMessage(targetUserID);
 		gameStateManager.GetNetworkManager().writeSocket(ackeMessage);
 
+		SendAddUserMessage(gameStateManager.GetUserID());
+		SendAddUserMessage(targetUserID);
+	}
+
+	private void SendAddUserMessage(string userID) {
 		// Generate the initial position and direction
 		Vector3 startPos = new Vector3(Random.Range(1.0f, 63.0f), 1.1f, Random.Range(1.0f, 63.0f));
 		float h, v;
@@ -62,15 +67,15 @@ public class MessageDispatcher : MonoBehaviour {
 				v = 1.0f;
 			}
 		}
-
-		// Generate add user message and send
+		
+		// Generate add new user message and send
 		Dictionary<string, object> addUserMessage = new Dictionary<string, object>();
 		addUserMessage.Add("type", ADD_USER);
-		addUserMessage.Add("userID", targetUserID);
+		addUserMessage.Add("userID", userID);
 		addUserMessage.Add("posX", startPos.x);
 		addUserMessage.Add("posY", startPos.y);
 		addUserMessage.Add("posZ", startPos.x);
-		addUserMessage.Add("honrizontalDir", h);
+		addUserMessage.Add("horizontalDir", h);
 		addUserMessage.Add("verticalDir", v);
 		addUserMessage.Add("time", gameStateManager.GetCurLogicTime());
 		gameStateManager.GetNetworkManager().writeSocket(addUserMessage);

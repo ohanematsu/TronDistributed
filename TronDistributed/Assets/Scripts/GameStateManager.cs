@@ -48,6 +48,7 @@ public class GameStateManager : MonoBehaviour {
 			message["horizontalDir"] = (object)horizontalDir;
 			message["verticalDir"] = (object)verticalDir;
 			message["time"] = (object)curLogicTime;
+			Debug.Log("Send local update message");
 			messageDispatcher.Dispatch(message);
 		}
 
@@ -155,7 +156,7 @@ public class GameStateManager : MonoBehaviour {
 		userID = networkManager.GetUserID();
 
 		// Initiate pause state
-		setPauseState(true);
+		//setPauseState(true);
 	}
 
 	private void SendJoinGameMessage() {
@@ -168,7 +169,7 @@ public class GameStateManager : MonoBehaviour {
 		Debug.Log("Send JOIN_GAME message");
 
 		// Set state to paused to wait for response
-		setPauseState(true);
+		//setPauseState(true);
 	}
 
 	public void setPauseState(bool state) {
