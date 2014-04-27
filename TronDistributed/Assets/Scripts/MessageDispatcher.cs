@@ -38,6 +38,10 @@ public class MessageDispatcher : MonoBehaviour {
 
 		// Generate ack message and send
 		string targetUserID = message["userID"] as string;
+		if (targetUserID == gameStateManager.GetUserID()) {
+			// If it receives a JOIN_GAME message sent from itself, discard it
+			return ;
+		}
 		Dictionary<string, object> ackeMessage = gameStateManager.GetPlayerManager().GenerateACKMessage(targetUserID);
 		gameStateManager.GetNetworkManager().writeSocket(ackeMessage);
 
