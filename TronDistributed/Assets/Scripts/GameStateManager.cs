@@ -36,22 +36,6 @@ public class GameStateManager : MonoBehaviour {
 			return ;
 		}
 
-		if (!paused) {
-			IncrementCurLogicTime();
-
-			// Detect keyboard event and send message to its own playermanager
-			float verticalDir = Input.GetAxisRaw("Vertical");   
-			float horizontalDir = Input.GetAxisRaw("Horizontal");
-			Dictionary<string, object> message = new Dictionary<string, object>();
-			message["type"] = (object)MessageDispatcher.UPDATE_USER;
-			message["userID"] = (object)userID;
-			message["horizontalDir"] = (object)horizontalDir;
-			message["verticalDir"] = (object)verticalDir;
-			message["time"] = (object)curLogicTime;
-			Debug.Log("Send local update message");
-			messageDispatcher.Dispatch(message);
-		}
-
 		// Deliver received messages
 		Dictionary<string, object> receiveMessage = networkManager.receive();
 		while (receiveMessage != null) {
@@ -59,6 +43,26 @@ public class GameStateManager : MonoBehaviour {
 			Debug.Log("Receive " + receiveMessage["type"] + " message!");
 			messageDispatcher.Dispatch(receiveMessage);
 			receiveMessage = networkManager.receive();
+		}
+
+		if (!paused) {
+			IncrementCurLogicTime();
+			
+			// Detect keyboard event and send message to its own playermanager
+			float verticalDir = Input.GetAxisRaw("Vertical");   
+			float horizontalDir = Input.GetAxisRaw("Horizontal");
+			if (verticalDir == 0.0f && horizontalDir == 0.0f) {
+				return ;
+			}
+
+			Dictionary<string, object> message = new Dictionary<string, object>();
+			message["type"] = (object)MessageDispatcher.UPDATE_USER;
+			message["userID"] = (object)userID;
+			message["horizontalDir"] = (object)horizontalDir;
+			message["verticalDir"] = (object)verticalDir;
+			message["time"] = (object)curLogicTime;
+			networkManager.writeSocket(message);
+			Debug.Log("Send local update message");
 		}
 	}
 

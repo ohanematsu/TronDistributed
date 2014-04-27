@@ -10,13 +10,14 @@ public class PlayerManager : MonoBehaviour{
 	private Dictionary<string, Player> Players;
 	private Dictionary<string, List<Dictionary<string, object>>> knownPlayerUnProcessedMsgList;
 	private List<Dictionary<string, object>> unknownPlayerUnProcessedMsgList;
+	private List<string> toDeletePlayer;
 
 	private GameStateManager gameStateManager;
 
 	private delegate void messageHandler(Dictionary<string, object> message);
 	private static Dictionary<string, messageHandler> messageHandlerList = new Dictionary<string, messageHandler>();
 
-	public float otherPlayerSpeed = 0.1f;
+	public float otherPlayerSpeed = 20;
 	private bool paused = false;
 
 	public void SetGameStateManager(GameStateManager globalGameStateManager) {
@@ -97,9 +98,9 @@ public class PlayerManager : MonoBehaviour{
 		Debug.Log("Init local user's position and direction complete");
 
 		// Instantiate prefabs
-		GameObject playerPrefab = Instantiate(otherPlayer, initPosition, Quaternion.identity) as GameObject;
+		//GameObject playerPrefab = Instantiate(otherPlayer, initPosition, Quaternion.identity) as GameObject;
 		Player newPlayer = new Player();
-		newPlayer.SetStartState(playerPrefab, otherPlayerSpeed, message);
+		newPlayer.SetStartState(new GameObject(), otherPlayerSpeed, message);
 		Players.Add(gameStateManager.GetUserID(), newPlayer);
 		Debug.Log("Init local user complete");
 
@@ -122,6 +123,7 @@ public class PlayerManager : MonoBehaviour{
 		//playerPrefab.transform.rotation = Quaternion.LookRotation(startDirection);
 		playerPrefab.AddComponent<CapsuleCollider>();
 		playerPrefab.AddComponent<TrailRenderer>();
+		playerPrefab.GetComponent<TrailRenderer>().time = 3600;
 		Debug.Log("Instantiate prefab for player " + userID + " complete");
 		
 		// Create player
@@ -134,6 +136,7 @@ public class PlayerManager : MonoBehaviour{
 
 	public void UpdatePlayer(Dictionary<string, object> message) {
 		string userID = message["userID"] as string;
+		Debug.Log("update user: " + userID);
 		if (!Players.ContainsKey(userID)) {
 			return ;
 		}
@@ -155,7 +158,7 @@ public class PlayerManager : MonoBehaviour{
 		int curLogicTime = Convert.ToInt32(message["time"]);
 		
 		// Update local player
-		gameStateManager.GetMotorController().UpdateMotor(horizontalDir, verticalDir, Time.fixedDeltaTime);
+		gameStateManager.GetMotorController().UpdateDirection(horizontalDir, verticalDir);
 
 		// Update information in player manager
 		Players[userID].GetProcessedMessage().Add(message);
@@ -166,7 +169,7 @@ public class PlayerManager : MonoBehaviour{
 	public void UpdateRemotePlayer(string userID, Dictionary<string, object> message) {
 		Debug.Log("Prepare to update remote player");
 		// Update remote player
-		Players [userID].UpdateBasedOnNetwork(message, Time.fixedDeltaTime);
+		Players[userID].UpdateBasedOnNetwork(message, Time.fixedDeltaTime);
 		Debug.Log("Update remote player complete");
 	}
 
@@ -178,15 +181,24 @@ public class PlayerManager : MonoBehaviour{
 			return ;
 		}
 	
-		// Delete player
-		List<GameObject> trailColliders = Players[userID].GetAllColliders();
-		foreach (GameObject collider in trailColliders) {
-			Destroy(collider);
+		toDeletePlayer.Add(userID);
+		Debug.Log("Add to todelete player list");
+	}
+
+	private void DestroyPlayers() {
+		foreach (string userID in toDeletePlayer) {
+			// Delete player
+			List<GameObject> trailColliders = Players[userID].GetAllColliders();
+			foreach (GameObject collider in trailColliders) {
+				Destroy(collider);
+			}
+			Destroy(Players[userID].GetPrefab());
+			Players.Remove(userID);
+			knownPlayerUnProcessedMsgList.Remove(userID);
+			Debug.Log("Remove player " + userID + " complete");
 		}
-		Destroy(Players[userID].GetPrefab());
-		Players.Remove(userID);
-		knownPlayerUnProcessedMsgList.Remove(userID);
-		Debug.Log("Remove player " + userID + " complete");
+
+		toDeletePlayer.Clear();
 	}
 
 	public Dictionary<string, object> GenerateACKMessage(string targetUserId) {
@@ -211,6 +223,7 @@ public class PlayerManager : MonoBehaviour{
 		knownPlayerUnProcessedMsgList = new Dictionary<string, List<Dictionary<string, object>>>();
 		unknownPlayerUnProcessedMsgList = new List<Dictionary<string, object>>();
 		Players = new Dictionary<string, Player>();
+		toDeletePlayer = new List<string>();
 
 		messageHandlerList.Add(MessageDispatcher.JOIN_GAME_ACK, SyncGlobalGameState);
 		messageHandlerList.Add(MessageDispatcher.ADD_USER,      AddNewPlayer);
@@ -227,22 +240,23 @@ public class PlayerManager : MonoBehaviour{
 		}*/
 		
 		// Process message of known players
-
-		Dictionary<string, List<Dictionary<string, object>>> cloneKnownPlayerUnProcessedMsgList = 
-			new Dictionary<string, List<Dictionary<string, object>>>(knownPlayerUnProcessedMsgList);
-		foreach (KeyValuePair<string, Player> pair in Players) {
+		foreach(KeyValuePair<string, Player> pair in Players) {
 			// If this player has unprocessed messages, process them first
 			if (knownPlayerUnProcessedMsgList[pair.Key].Count != 0) {
 				Debug.Log("Dispatch message for user" + pair.Key);
-				foreach (Dictionary<string, object> msg in cloneKnownPlayerUnProcessedMsgList[pair.Key]) {
+				foreach (Dictionary<string, object> msg in knownPlayerUnProcessedMsgList[pair.Key]) {
 					Dispatch(msg);
-					knownPlayerUnProcessedMsgList[pair.Key].Remove(msg);
+					//knownPlayerUnProcessedMsgList[pair.Key].Remove(msg);
 				}
+				knownPlayerUnProcessedMsgList[pair.Key].Clear();
 			}
 
 			// Update the player
+			Debug.Log("user id: " + pair.Key);
 			if (pair.Key != gameStateManager.GetUserID()) {
 				pair.Value.UpdateBasedOnPrediction(gameStateManager.GetCurLogicTime(), Time.fixedTime);
+			} else {
+				gameStateManager.GetMotorController().UpdateMotor(Time.fixedDeltaTime);
 			}
 		}
 
@@ -251,7 +265,9 @@ public class PlayerManager : MonoBehaviour{
 		// Process messages for unknown players
 		foreach (Dictionary<string, object> msg in cloneUnknownPlayerUnProcessedMsgList) {
 			Dispatch(msg);
-			unknownPlayerUnProcessedMsgList.Remove(msg);
 		}
+		unknownPlayerUnProcessedMsgList.Clear();
+
+		DestroyPlayers();
 	}
 }

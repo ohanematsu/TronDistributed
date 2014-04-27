@@ -75,8 +75,6 @@ public class MotorController : MonoBehaviour {
 
 	//private bool paused = true;
 
-	private bool directionChanged = false;
-
 	private Vector3 invisiblePlace = new Vector3(32.0f, -10.0f, 32.0f);
 
 	// Use this for initialization
@@ -117,19 +115,30 @@ public class MotorController : MonoBehaviour {
 
 	public void SetInitParameters(Vector3 initPos, float initHorizontalDir, float initVerticalDir) {
 		gameObject.transform.position = initPos;
-		UpdateSmoothedMovementDirection(initHorizontalDir, initVerticalDir);
+		UpdateDirection(initHorizontalDir, initVerticalDir);
+		UpdateSmoothedMovementDirection();
 		transform.rotation = Quaternion.LookRotation(moveDirection);
-		directionChanged = false; // Reset
 	}
 
-	public void UpdateMotor(float newHorizontalDir, float newVerticalDir, float fixedDeltaTime) {
+	public void UpdateDirection(float newHorizontalDir, float newVerticalDir) {
+		if (newVerticalDir != 0.0f) {
+			curVerticalDir = newVerticalDir;
+			curHorizontalDir = 0.0f;
+		}
+		if (newHorizontalDir != 0.0f) {
+			curHorizontalDir = newHorizontalDir;
+			curVerticalDir = 0.0f;
+		}
+	}
+
+	public void UpdateMotor(float fixedDeltaTime) {
 		if (!isControllable) {
 			// kill all inputs if not controllable.
 			Input.ResetInputAxes();
 		}
 
 		// Calculate move direction
-		UpdateSmoothedMovementDirection(newHorizontalDir, newVerticalDir);
+		UpdateSmoothedMovementDirection();
 		
 		// Calculate actual action
 		Vector3 movement = moveDirection * moveSpeed;
@@ -144,19 +153,21 @@ public class MotorController : MonoBehaviour {
 		transform.rotation = Quaternion.LookRotation(moveDirection);
 		
 		// If direction changed, send UPDATE_USER message
+		/*
 		if (directionChanged) {
 			Dictionary<string, object> message = new Dictionary<string, object>();
-			message["honrizontalDir"] = curHorizontalDir;
-			message["verticalDir"] = curVerticalDir;
 			message["type"] = MessageDispatcher.UPDATE_USER;
+			message["userID"] = gameStateManager.GetUserID();
+			message["horizontalDir"] = curHorizontalDir;
+			message["verticalDir"] = curVerticalDir;
 			message["time"] = gameStateManager.GetCurLogicTime();
 			gameStateManager.GetNetworkManager().writeSocket(message);
 			Debug.Log ("Sent Message");
 			directionChanged = false; //Reset
-		}
+		}*/
 	}
 
-	private void UpdateSmoothedMovementDirection(float newHorizontalDir, float newVerticalDir) {
+	private void UpdateSmoothedMovementDirection() {
 		Transform cameraTransform = Camera.main.transform;
 
 		// Forward vector relative to the camera along the x-z plane    
@@ -168,20 +179,21 @@ public class MotorController : MonoBehaviour {
 		// Always orthogonal to the forward vector
 		Vector3 right = new Vector3(forward.z, 0, -forward.x);
 
-		if (newVerticalDir != 0) {
+		/*
+		if (newVerticalDir != 0.0f) {
 			if (newVerticalDir != curVerticalDir) {
 				directionChanged = true;
 			}
 			curVerticalDir = newVerticalDir;
-			curHorizontalDir = 0;
+			curHorizontalDir = 0.0f;
 		}
-		if (newHorizontalDir != 0) {
+		if (newHorizontalDir != 0.0f) {
 			if (newHorizontalDir != curHorizontalDir) {
 				directionChanged = true;
 			}
 			curHorizontalDir = newHorizontalDir;
-			curVerticalDir = 0;
-		}
+			curVerticalDir = 0.0f;
+		}*/
 
 		// Are we moving backwards or looking backwards
 		if (curVerticalDir < -0.2f) {
@@ -209,6 +221,7 @@ public class MotorController : MonoBehaviour {
 			}
 		}
 
+		/*
 		// Smooth the speed based on the current target direction
 		float curSmooth = speedSmoothing * Time.deltaTime;
 
@@ -220,14 +233,15 @@ public class MotorController : MonoBehaviour {
 			targetSpeed *= trotSpeed;
 		} else {
 			targetSpeed *= walkSpeed;
-		}
+		}*/
 
-		moveSpeed = Mathf.Lerp(moveSpeed, targetSpeed, curSmooth);
-
+		//moveSpeed = Mathf.Lerp(moveSpeed, targetSpeed, curSmooth);
+		moveSpeed = 0.1f;
+		/*
 		// Reset walk time start when we slow down
 		if (moveSpeed < walkSpeed * 0.3f) {
 			walkTimeStart = Time.time;
-		}		
+		}	*/	
 	}
 	
 	float GetSpeed() {
