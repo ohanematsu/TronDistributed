@@ -178,7 +178,11 @@ public class PlayerManager : MonoBehaviour{
 		}
 	
 		// Delete player
-		Players[userID].DestroyAllGameObject();
+		List<GameObject> trailColliders = Players[userID].GetAllColliders();
+		foreach (GameObject collider in trailColliders) {
+			Destroy(collider);
+		}
+		Destroy(Players[userID].GetPrefab());
 		Players.Remove(userID);
 		knownPlayerUnProcessedMsgList.Remove(userID);
 		Debug.Log("Remove player " + userID + " complete");
@@ -228,6 +232,7 @@ public class PlayerManager : MonoBehaviour{
 				Debug.Log("Dispatch message for user" + pair.Key);
 				foreach (Dictionary<string, object> msg in knownPlayerUnProcessedMsgList[pair.Key]) {
 					Dispatch(msg);
+					knownPlayerUnProcessedMsgList[pair.Key].Remove(msg);
 				}
 			}
 
@@ -240,6 +245,7 @@ public class PlayerManager : MonoBehaviour{
 		// Process messages for unknown players
 		foreach (Dictionary<string, object> msg in unknownPlayerUnProcessedMsgList) {
 			Dispatch(msg);
+			unknownPlayerUnProcessedMsgList.Remove(msg);
 		}
 	}
 }

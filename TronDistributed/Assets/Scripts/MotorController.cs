@@ -104,7 +104,7 @@ public class MotorController : MonoBehaviour {
 		}
 	
 		// Set initial position is invisible to the player
-		gameObject.transform.position = invisiblePlace;
+		//gameObject.transform.position = invisiblePlace;
 
 		// Set initial state as paused
 		//paused = true;

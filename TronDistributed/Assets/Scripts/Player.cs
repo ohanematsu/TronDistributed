@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections;
 using System;
 
-public class Player : MonoBehaviour {
+public class Player {
 
 	public GameObject motor;
 	//private bool isLocal;
@@ -48,14 +48,14 @@ public class Player : MonoBehaviour {
 		// Set position and rotation
 		motor.transform.position = initPosition;
 		Vector3 moveDirection = new Vector3(curHorizontalDir, 0, curVerticalDir);
-		moveDirection = transform.TransformDirection(moveDirection);
+		moveDirection = motor.transform.TransformDirection(moveDirection);
 		motor.transform.rotation = Quaternion.LookRotation(moveDirection);
 	}
 	
 	public void UpdateBasedOnPrediction(int newLogicTime, float fixedDeltaTime) {
 		// Calculate movement
 		Vector3 moveDirection = new Vector3(curHorizontalDir, 0, curVerticalDir);
-		moveDirection = transform.TransformDirection(moveDirection);
+		moveDirection = motor.transform.TransformDirection(moveDirection);
 		Vector3 movement = moveDirection * moveSpeed * fixedDeltaTime;
 
 		// Update player's position
@@ -95,11 +95,6 @@ public class Player : MonoBehaviour {
 		return processedMessage;
 	}
 
-	public void DestroyAllGameObject() {
-		DestroyPrefab();
-		DestroyAllColliders();
-	}
-
 	private void CreateTrailCollider(Vector3 oldPos) {
 		GameObject trailCollider = new GameObject("TrailCollider");
 		Vector3 newPos = motor.transform.position;
@@ -112,16 +107,12 @@ public class Player : MonoBehaviour {
 		trailColliders.Add(trailCollider);
 	}
 
-	private void DestroyAllColliders() {
-		for (int i = 0; i < trailColliders.Count; i++) {
-			Destroy(trailColliders[i]);
-			Debug.Log("Destroy trail collider " + i + " in player " + userId);
-		}
+	public List<GameObject> GetAllColliders() {
+		return trailColliders;
 	}
 
-	private void DestroyPrefab() {
-		Destroy(motor);
-		Debug.Log("Remove fab of player " + userId + " complete");
+	public GameObject GetPrefab() {
+		return motor;
 	}
 }
 

@@ -88,14 +88,14 @@ public class NetworkManager : MonoBehaviour {
 	void Start() 
 	{
 		// Dummy function
-		IPHostEntry host;
+		/*IPHostEntry host;
 		host = Dns.GetHostEntry (Dns.GetHostName ());
 		foreach (IPAddress ip in host.AddressList) {
 			if (ip.AddressFamily == AddressFamily.InterNetwork) {
 				mIpAddr = ip.ToString();
 				break;
 			}
-		}
+		}*/
 
 		// May there are other stuffs that need to be initialized?
 		mUserID = mIpAddr + ":" + mPort.ToString();

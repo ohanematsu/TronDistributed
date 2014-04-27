@@ -37,12 +37,12 @@ public class MessageDispatcher : MonoBehaviour {
 		Debug.Log("HandleJoinGameMessage");
 
 		// Generate ack message and send
-		string targetUserID = message["type"] as string;
+		string targetUserID = message["userID"] as string;
 		Dictionary<string, object> ackeMessage = gameStateManager.GetPlayerManager().GenerateACKMessage(targetUserID);
 		gameStateManager.GetNetworkManager().writeSocket(ackeMessage);
 
 		// Generate the initial position and direction
-		Vector3 startPos = new Vector3(Random.Range(1.0f, 63.0f), 1, Random.Range(1.0f, 63.0f));
+		Vector3 startPos = new Vector3(Random.Range(1.0f, 63.0f), 1.1f, Random.Range(1.0f, 63.0f));
 		float h, v;
 		float tmp = Random.Range(0.0f, 300.0f);
 		if (0.0f <= tmp && tmp < 100.0f) {
