@@ -138,11 +138,15 @@ public class MotorController : MonoBehaviour {
 		}
 
 		// Calculate move direction
-		UpdateSmoothedMovementDirection();
+		//UpdateSmoothedMovementDirection();
 		
 		// Calculate actual action
+		Vector3 moveDirection = new Vector3(curHorizontalDir, 0, curVerticalDir);
+		//moveDirection = moveDirection.normalized;
+		//moveDirection = transform.TransformDirection(moveDirection);
 		Vector3 movement = moveDirection * moveSpeed;
 		movement *= fixedDeltaTime;
+
 		
 		// Move the controller
 		CharacterController controller = GetComponent<CharacterController>();
@@ -221,7 +225,7 @@ public class MotorController : MonoBehaviour {
 			}
 		}
 
-		/*
+
 		// Smooth the speed based on the current target direction
 		float curSmooth = speedSmoothing * Time.deltaTime;
 
@@ -233,15 +237,15 @@ public class MotorController : MonoBehaviour {
 			targetSpeed *= trotSpeed;
 		} else {
 			targetSpeed *= walkSpeed;
-		}*/
+		}
 
-		//moveSpeed = Mathf.Lerp(moveSpeed, targetSpeed, curSmooth);
-		moveSpeed = 0.1f;
-		/*
+		moveSpeed = Mathf.Lerp(moveSpeed, targetSpeed, curSmooth);
+		//moveSpeed = 0.1f;
+		
 		// Reset walk time start when we slow down
 		if (moveSpeed < walkSpeed * 0.3f) {
 			walkTimeStart = Time.time;
-		}	*/	
+		}
 	}
 	
 	float GetSpeed() {
