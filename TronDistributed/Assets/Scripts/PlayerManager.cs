@@ -63,7 +63,7 @@ public class PlayerManager : MonoBehaviour{
 
 		gameStateManager.SetCurLogicTime(Convert.ToInt32(message["time"]));
 		Debug.Log("After receiving JOIN_ACK, time is " + gameStateManager.GetCurLogicTime ());
-		gameStateManager.setState(GameStateManager.WAIT_FOR_ADD_LOCAL);
+		gameStateManager.setState(GameStateManager.RECEIVED_JOIN_ACK);
 		Debug.Log("After receiving JOIN_ACK, state is " + gameStateManager.GetState ());
 	}
 
@@ -111,7 +111,7 @@ public class PlayerManager : MonoBehaviour{
 
 		// Enable update
 		Debug.Log("After receiving ADD_USER, state is " + gameStateManager.GetState());
-		if (gameStateManager.GetState() == GameStateManager.WAIT_FOR_ADD_LOCAL) {
+		if (gameStateManager.GetState() == GameStateManager.RECEIVED_JOIN_ACK) {
 			gameStateManager.setState(GameStateManager.NORMAL);
 			gameStateManager.setPauseState(false);
 			Debug.Log("Enable update");

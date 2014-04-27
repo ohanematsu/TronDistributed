@@ -17,7 +17,8 @@ public class GameStateManager : MonoBehaviour {
 
 	private int state;
 	public static int NORMAL = 0;
-	public static int WAIT_FOR_ADD_LOCAL = 1;
+	public static int SENT_JOIN = 1;
+	public static int RECEIVED_JOIN_ACK = 2;
 
 	void Start() {
 		// Get all components
@@ -200,6 +201,8 @@ public class GameStateManager : MonoBehaviour {
 
 		// Set state to paused to wait for response
 		setPauseState(true);
+
+		state = SENT_JOIN;
 	}
 
 	public void setPauseState(bool state) {
