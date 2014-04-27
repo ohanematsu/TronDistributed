@@ -107,7 +107,11 @@ public class Player {
 		trailCollider.transform.LookAt(newPos); // Rotates the transform so the forward vector points at target's current position.
 			
 		BoxCollider boxCollider = trailCollider.AddComponent("BoxCollider") as BoxCollider;
-		boxCollider.size = new Vector3(0.05f, 3f, Vector3.Distance(newPos, oldPos));
+		if (newPos.x == oldPos.x) { // If motor don't change its horizontal direction
+			boxCollider.size = new Vector3(0.02f, 3f, Vector3.Distance(newPos, oldPos));
+		} else {
+			boxCollider.size = new Vector3(Vector3.Distance(newPos, oldPos), 3f, 0.02f);
+		}
 
 		trailColliders.Add(trailCollider);
 	}

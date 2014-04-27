@@ -26,7 +26,11 @@ public class InvisibleBoxLocator : MonoBehaviour {
 		wall.transform.LookAt(newWallWorldPos); // Rotates the transform so the forward vector points at target's current position.
 
 		BoxCollider boxCollider = wall.AddComponent("BoxCollider") as BoxCollider;
-		boxCollider.size = new Vector3(0.05f, 3f, Vector3.Distance(newWallWorldPos, lastWallWorldPos));
+		if (newWallWorldPos.x == lastWallWorldPos.x) { // If motor don't change its horizontal direction
+			boxCollider.size = new Vector3(0.02f, 3f, Vector3.Distance(newWallWorldPos, lastWallWorldPos));
+		} else {
+			boxCollider.size = new Vector3(Vector3.Distance(newWallWorldPos, lastWallWorldPos), 3f, 0.02f);
+		}
 
 		lastWallWorldPos = newWallWorldPos;
 	}

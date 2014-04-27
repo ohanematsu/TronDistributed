@@ -58,6 +58,13 @@ public class PlayerManager : MonoBehaviour{
 			List<Dictionary<string, object>> messages = pair.Value as List<Dictionary<string, object>>;
 			foreach (Dictionary<string, object> processedMessage in messages) {
 				Dispatch(processedMessage);
+
+				// Quickly Update the player
+				Debug.Log("Quickly update user: " + userID);
+				if (!Players.ContainsKey(userID)) {
+					Debug.Log("user " + userID + "doesnt exsits");
+				}
+				// TODO : UPDATE POSITION
 			}
 		}
 
