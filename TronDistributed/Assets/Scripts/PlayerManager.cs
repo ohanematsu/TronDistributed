@@ -58,10 +58,17 @@ public class PlayerManager : MonoBehaviour{
 		foreach (KeyValuePair<string, object> pair in passedAllUsersGlobalStates) {
 			string userID = pair.Key as string;
 			Debug.Log("Sync User: " + userID);
-			List<Dictionary<string, object>> messages = pair.Value as List<Dictionary<string, object>>;
+			//List<Dictionary<string, object>> messages = pair.Value as List<Dictionary<string, object>>;
+			List<object> messages = pair.Value as List<object>;
+			if (messages == null) {
+				Debug.Log("messages is NULL");
+			}
+			Debug.Log("Messages's TYPE = " + messages.GetType());
 			int curLogicTime = 0;
-			foreach (Dictionary<string, object> processedMessage in messages) {
-				Dispatch(processedMessage);
+			//foreach (Dictionary<string, object> processedMessage in messages) {
+			foreach (object msg in messages) {
+				Dictionary<string, object> processedMessage = msg as Dictionary<string, object>;
+				Dispatch(processedMessage as Dictionary<string, object>);
 
 				// Quickly Update the player
 				Debug.Log("Quickly update user: " + userID);
