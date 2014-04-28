@@ -77,6 +77,10 @@ public class MotorController : MonoBehaviour {
 
 	private Vector3 invisiblePlace = new Vector3(32.0f, -10.0f, 32.0f);
 
+	private Vector3 cameraMotorDistance;
+
+	private Camera mainCamera;
+
 	// Use this for initialization
 	void Awake (){
 		moveDirection = transform.TransformDirection(Vector3.forward);
@@ -106,6 +110,10 @@ public class MotorController : MonoBehaviour {
 
 		// Set initial state as paused
 		//paused = true;
+
+		mainCamera = Camera.main;
+
+		cameraMotorDistance = mainCamera.transform.position - gameObject.transform.position;
 	}
 
 	public void SetGameStateManager(GameStateManager globalGameStateManager) {
@@ -118,6 +126,7 @@ public class MotorController : MonoBehaviour {
 		UpdateDirection(initHorizontalDir, initVerticalDir);
 		//UpdateSmoothedMovementDirection();
 		transform.rotation = Quaternion.LookRotation(moveDirection);
+		mainCamera.transform.position = initPos + cameraMotorDistance;
 	}
 
 	public void UpdateDirection(float newHorizontalDir, float newVerticalDir) {
@@ -169,6 +178,9 @@ public class MotorController : MonoBehaviour {
 			Debug.Log ("Sent Message");
 			directionChanged = false; //Reset
 		}*/
+
+		// Update Camera Position
+		mainCamera.transform.position += movement;
 	}
 
 	private void UpdateSmoothedMovementDirection() {
