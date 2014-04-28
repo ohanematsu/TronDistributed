@@ -73,13 +73,8 @@ public class MotorController : MonoBehaviour {
 
 	private GameStateManager gameStateManager;
 
-	//private bool paused = true;
-
-	private Vector3 invisiblePlace = new Vector3(32.0f, -10.0f, 32.0f);
-
-	private Vector3 cameraMotorDistance;
-
 	private Camera mainCamera;
+	private Vector3 cameraMotorDistance;
 
 	// Use this for initialization
 	void Awake (){
@@ -104,29 +99,21 @@ public class MotorController : MonoBehaviour {
 			_animation = null;
 			Debug.Log("No run animation found. Turning off animations.");
 		}
-	
-		// Set initial position is invisible to the player
-		//gameObject.transform.position = new Vector3(Random.Range(1.0f, 63.0f), 1.1f, Random.Range(1.0f, 63.0f));
 
-		// Set initial state as paused
-		//paused = true;
-
+		// Calculate the distance between camera and player
 		mainCamera = Camera.main;
-
 		cameraMotorDistance = mainCamera.transform.position - gameObject.transform.position;
 	}
 
 	public void SetGameStateManager(GameStateManager globalGameStateManager) {
 		gameStateManager = globalGameStateManager;
-		//gameStateManager.setPauseState(false);
 	}
 
 	public void SetInitParameters(Vector3 initPos, float initHorizontalDir, float initVerticalDir) {
 		gameObject.transform.position = initPos;
 		UpdateDirection(initHorizontalDir, initVerticalDir);
-		//UpdateSmoothedMovementDirection();
 		transform.rotation = Quaternion.LookRotation(moveDirection);
-		//mainCamera.transform.position = initPos + cameraMotorDistance;
+		mainCamera.transform.position = initPos + cameraMotorDistance;
 	}
 
 	public void UpdateDirection(float newHorizontalDir, float newVerticalDir) {
@@ -151,8 +138,6 @@ public class MotorController : MonoBehaviour {
 		
 		// Calculate actual action
 		Vector3 moveDirection = new Vector3(curHorizontalDir, 0, curVerticalDir);
-		//moveDirection = moveDirection.normalized;
-		//moveDirection = transform.TransformDirection(moveDirection);
 		Vector3 movement = moveDirection * gameStateManager.GetMoveSpeed();
 		movement *= fixedDeltaTime;
 		Debug.Log("Local Movement: " + movement.x + "," + movement.y + "," + movement.z + ", speed = " + gameStateManager.GetMoveSpeed());
@@ -164,23 +149,9 @@ public class MotorController : MonoBehaviour {
 		
 		// Set rotation to the move direction
 		transform.rotation = Quaternion.LookRotation(moveDirection);
-		
-		// If direction changed, send UPDATE_USER message
-		/*
-		if (directionChanged) {
-			Dictionary<string, object> message = new Dictionary<string, object>();
-			message["type"] = MessageDispatcher.UPDATE_USER;
-			message["userID"] = gameStateManager.GetUserID();
-			message["horizontalDir"] = curHorizontalDir;
-			message["verticalDir"] = curVerticalDir;
-			message["time"] = gameStateManager.GetCurLogicTime();
-			gameStateManager.GetNetworkManager().writeSocket(message);
-			Debug.Log ("Sent Message");
-			directionChanged = false; //Reset
-		}*/
 
 		// Update Camera Position
-		//mainCamera.transform.position += movement;
+		mainCamera.transform.position += movement;
 	}
 
 	private void UpdateSmoothedMovementDirection() {
