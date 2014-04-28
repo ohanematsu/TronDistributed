@@ -68,24 +68,26 @@ public class PlayerManager : MonoBehaviour{
 			//foreach (Dictionary<string, object> processedMessage in messages) {
 			foreach (object msg in messages) {
 				Dictionary<string, object> processedMessage = msg as Dictionary<string, object>;
-				Dispatch(processedMessage as Dictionary<string, object>);
+
+				string type = processedMessage["type"] as String;
+				if (type == MessageDispatcher.ADD_USER) {
+					curLogicTime = Convert.ToInt32(processedMessage["time"]);
+					Debug.Log("Fast processed ADD_USER message");
+				} else {
+					int newLogicTime = Convert.ToInt32(processedMessage["time"]);
+					Players[userID].UpdateBasedOnPrediction(newLogicTime, 
+					    gameStateManager.GetTimeInterval() * (newLogicTime - curLogicTime));
+					curLogicTime = newLogicTime;
+					Debug.Log("Fast processed UPDATE message");
+				}
+
+				Dispatch(processedMessage);
 
 				// Quickly Update the player
 				Debug.Log("Quickly update user: " + userID);
 				if (!Players.ContainsKey(userID)) {
 					Debug.Log("user " + userID + "doesnt exsits");
 					continue;
-				}
-				string type = processedMessage["type"] as String;
-				if (type == MessageDispatcher.ADD_USER) {
-					Debug.Log("Fast processed ADD_USER message");
-					curLogicTime = Convert.ToInt32(processedMessage["time"]);
-				} else {
-					Debug.Log("Fast processed UPDATE message");
-					int newLogicTime = Convert.ToInt32(processedMessage["time"]);
-					Players[userID].UpdateBasedOnPrediction(newLogicTime, 
-					    gameStateManager.GetTimeInterval() * (newLogicTime - curLogicTime));
-					curLogicTime = newLogicTime;
 				}
 			}
 

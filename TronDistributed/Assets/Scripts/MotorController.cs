@@ -266,6 +266,14 @@ public class MotorController : MonoBehaviour {
 		return moveDirection;
 	}
 
+	public float GetHorizontalDir() {
+		return curHorizontalDir;
+	}
+
+	public float GetVerticalDir() {
+		return curVerticalDir;
+	}
+
 	bool IsMovingBackwards() {
 		return movingBack;
 	}

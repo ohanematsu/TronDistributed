@@ -61,6 +61,9 @@ public class GameStateManager : MonoBehaviour {
 			if (verticalDir == 0.0f && horizontalDir == 0.0f) {
 				return ;
 			}
+			if (verticalDir == motorController.GetVerticalDir() && horizontalDir == motorController.GetHorizontalDir()) {
+				return ;
+			}
 
 			Dictionary<string, object> message = new Dictionary<string, object>();
 			message["type"] = (object)MessageDispatcher.UPDATE_USER;

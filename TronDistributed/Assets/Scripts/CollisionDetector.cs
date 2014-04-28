@@ -24,8 +24,9 @@ public class CollisionDetector : MonoBehaviour {
 			Debug.Log("Cannot find NetworkManager");
 		}
 		Debug.Log("Get network manager success!");
-		if (!networkManager.GetSocketState()) {
+		if (networkManager.GetSocketState()) {
 			networkManager.closeSocket();
+			Debug.Log("CLOSE!!!!!");
 		}
 
 		Application.LoadLevel(2);
