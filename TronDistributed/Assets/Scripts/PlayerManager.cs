@@ -57,6 +57,7 @@ public class PlayerManager : MonoBehaviour{
 
 		foreach (KeyValuePair<string, object> pair in passedAllUsersGlobalStates) {
 			string userID = pair.Key as string;
+			Debug.Log("Sync User: " + userID);
 			List<Dictionary<string, object>> messages = pair.Value as List<Dictionary<string, object>>;
 			int curLogicTime = 0;
 			foreach (Dictionary<string, object> processedMessage in messages) {
@@ -131,7 +132,7 @@ public class PlayerManager : MonoBehaviour{
 		Player newPlayer = new Player();
 		newPlayer.SetStartState(new GameObject(), otherPlayerSpeed, message);
 		Players.Add(gameStateManager.GetUserID(), newPlayer);
-		newPlayer.GetProcessedMessage().Add(message);
+		//newPlayer.GetProcessedMessage().Add(message);
 		Debug.Log("Init local user complete");
 
 		// Enable update
@@ -165,7 +166,7 @@ public class PlayerManager : MonoBehaviour{
 		Player newPlayer = new Player();
 		newPlayer.SetStartState(playerPrefab, gameStateManager.getMoveSpeed(), message);
 		Players.Add(userID, newPlayer);
-		newPlayer.GetProcessedMessage().Add(message);
+		//newPlayer.GetProcessedMessage().Add(message);
 		Debug.Log("Initate player " + userID + " complete");
 	}
 
@@ -239,6 +240,7 @@ public class PlayerManager : MonoBehaviour{
 
 	public Dictionary<string, object> GenerateACKMessage(string targetUserId) {
 		Debug.Log("Prepare to compare generate ack message");
+		Debug.Log("Player num: " + Players.Count);
 		Dictionary<string, object> globalStateMessage = new Dictionary<string, object>();
 		foreach (KeyValuePair<string, Player> playerPair in Players) {
 			globalStateMessage.Add(playerPair.Key, playerPair.Value.GetProcessedMessage());
@@ -304,6 +306,8 @@ public class PlayerManager : MonoBehaviour{
 		}
 		unknownPlayerUnProcessedMsgList.Clear();
 
-		DestroyPlayers();
+		if (toDeletePlayer.Count != 0) {
+			DestroyPlayers ();
+		}
 	}
 }

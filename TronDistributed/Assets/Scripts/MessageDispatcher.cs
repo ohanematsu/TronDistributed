@@ -89,7 +89,7 @@ public class MessageDispatcher : MonoBehaviour {
 	}
 
 	private void HandleJoinGameACKMessage(Dictionary<string, object> message) {
-		Debug.Log("HandleAddUserMessage");
+		Debug.Log("HandleJoinGameACKMessage");
 		string targetUserID = message["userID"] as string;
 		if (targetUserID == gameStateManager.GetUserID ()) {
 			EnqueuePlayerManagerUnProcessedMessageQueue(message);
