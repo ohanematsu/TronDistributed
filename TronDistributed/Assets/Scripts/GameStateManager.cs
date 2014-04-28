@@ -83,7 +83,12 @@ public class GameStateManager : MonoBehaviour {
 
 	void OnDestroy() {
 		if (networkManager.GetSocketState()) {
+			Dictionary<string, object> message = new Dictionary<string, object>();
+			message["type"] = MessageDispatcher.DELETE_USER;
+			message["userID"] = userID;
+			networkManager.writeSocket(message);
 			networkManager.closeSocket();
+			Debug.Log("Release! Socket closed");
 		}
 	}
 
@@ -181,7 +186,7 @@ public class GameStateManager : MonoBehaviour {
 		userID = networkManager.GetUserID();
 
 		// Initiate moveSpeed 
-		moveSpeed = 4.0f;
+		moveSpeed = 5.0f;
 
 		state = NORMAL;
 

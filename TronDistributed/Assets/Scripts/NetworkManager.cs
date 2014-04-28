@@ -31,21 +31,21 @@ public class NetworkManager : MonoBehaviour {
 	private Queue mMsgQueue = new Queue();
 
 	// For debugging message exchange
-	void OnGUI() {
-		if (!mSocketReady) {
-			GUI.Label (new Rect (10, 10, 200, 20), "Status: Disconnected");
-		}
-		else {
-			GUI.Label (new Rect (10, 10, 200, 20), "Status: Connected");
-		}
+	//void OnGUI() {
+	//	if (!mSocketReady) {
+	//		GUI.Label (new Rect (10, 10, 200, 20), "Status: Disconnected");
+	//	}
+	//	else {
+	//		GUI.Label (new Rect (10, 10, 200, 20), "Status: Connected");
+	//	}
 
-		GUI.Label (new Rect (200, 10, 200, 20), "Queue count: " + mMsgQueue.Count.ToString());
+	//	GUI.Label (new Rect (200, 10, 200, 20), "Queue count: " + mMsgQueue.Count.ToString());
 
 		/* 
 		 * Event Simulation for debugging
 		 */
-		if (GUI.Button(new Rect(10, 110, 120, 20), "Read Message"))
-		{
+	//	if (GUI.Button(new Rect(10, 110, 120, 20), "Read Message"))
+	//	{
 			// Print the received message
 			/*Message msg = receive();
 
@@ -57,10 +57,10 @@ public class NetworkManager : MonoBehaviour {
 			{
 				Debug.Log("There are no more messages in the queue");
 			}*/
-		}
-		if (GUI.Button(new Rect(10, 90, 120, 20), "Send Message"))
-		{
-			Debug.Log("Sending message....");
+	//	}
+	//	if (GUI.Button(new Rect(10, 90, 120, 20), "Send Message"))
+	//	{
+	//		Debug.Log("Sending message....");
 			//string msg = "{\"Name\":\"test\", \"array\":[1,{\"data\":\"value\"}]}";
 			//string msg = "{\"Type\":\"test\", \"UserName\":5, \"VerticalDir\":1.5, \"HorizontalDir\":5.8, \"PosX\":3.0, \"PosY\":6.0, \"PosZ\":10.0}";
 			//Debug.Log ("msg test: " + msg);
@@ -68,21 +68,21 @@ public class NetworkManager : MonoBehaviour {
 			//Debug.Log ("real message str: " + m.toJsonString());
 			//writeSocket(msg);
 			//writeSocket(m.toJsonString());
-		}
+	//	}
 
-		if (GUI.Button(new Rect(10, 50, 160, 20), "Establish Connection"))
-		{
+	//	if (GUI.Button(new Rect(10, 50, 160, 20), "Establish Connection"))
+	//	{
 			// Initialize the connection to the game logic componenet
-			initialize();
-		}
+	//		initialize();
+	//	}
 
-		if (GUI.Button(new Rect(10, 70, 160, 20), "Disconnect"))
-		{
+	//	if (GUI.Button(new Rect(10, 70, 160, 20), "Disconnect"))
+	//	{
 			// Close the connection to the game logic componenet
-			closeSocket();
-		}
+	//		closeSocket();
+	//	}
 
-	}
+	//}
 
 	// This function is invoked to initialize variables, stuff, etc
 	void Start() 
