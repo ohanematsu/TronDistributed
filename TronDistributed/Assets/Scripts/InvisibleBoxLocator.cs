@@ -5,21 +5,26 @@ public class InvisibleBoxLocator : MonoBehaviour {
 
 	Vector3 lastWallWorldPos;
 	Vector3 offset;
+	private bool paused;
 
 	// Use this for initialization
 	void Start () {
 		offset = new Vector3(0, 0, -2.0f);
 		lastWallWorldPos = transform.TransformPoint(gameObject.transform.localPosition + offset);
+		paused = true;
 	}
 	
 	// Update is called once per frame
-	void Update () {
-		MakeWall();
+	void FixedUpdate () {
+		if (paused) {
+			return ;
+		}
+		PutCollider();
 	}
 
-	void MakeWall()
+	void PutCollider()
 	{
-		GameObject wall = new GameObject("Wall");
+		GameObject wall = new GameObject("TrailCollider");
 
 		Vector3 newWallWorldPos = transform.TransformPoint(gameObject.transform.localPosition + offset);
 		wall.transform.position = Vector3.Lerp(newWallWorldPos, lastWallWorldPos, 0.5f);
@@ -33,5 +38,9 @@ public class InvisibleBoxLocator : MonoBehaviour {
 		}
 
 		lastWallWorldPos = newWallWorldPos;
+	}
+
+	public void SetPauseState(bool state) {
+		paused = state;
 	}
 }

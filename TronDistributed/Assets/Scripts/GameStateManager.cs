@@ -8,10 +8,11 @@ public class GameStateManager : MonoBehaviour {
 	private PlayerManager playerManager;
 	private MessageDispatcher messageDispatcher;
 	private MotorController motorController;
+	private InvisibleBoxLocator colliderMaker;
 
 	private int curLogicTime;
 	private string userID;
-	private bool paused;
+	private bool paused = true;
 	private bool receiveMsg;
 	private float moveSpeed;
 	private float timeInterval;
@@ -27,6 +28,7 @@ public class GameStateManager : MonoBehaviour {
 		InitPlayerManager();
 		InitMessageDispatcher();
 		InitMotorController();
+		InitColliderMaker();
 
 		// Initiate global values
 		InitGlobalValues();
@@ -175,6 +177,23 @@ public class GameStateManager : MonoBehaviour {
 		motorController.SetGameStateManager(this);
 		Debug.Log("Get motorController success");
 	}
+	
+	private void InitColliderMaker() {
+		// Get InvisibleBoxLocator
+		Transform trailTransform = transform.GetChild(transform.childCount - 1);
+		if (trailTransform == null) {
+			Debug.Log("Find trail transform failed!");
+			Application.LoadLevel(2);
+		}
+		Debug.Log("Get trail transform success!");
+
+		colliderMaker = trailTransform.gameObject.GetComponent<InvisibleBoxLocator>();
+		if (colliderMaker == null) {
+			Debug.Log("Find colliderMaker failed");
+			Application.LoadLevel(2);
+		}
+		Debug.Log("Get colider maker success!");
+	}
 
 	private void InitGlobalValues() {
 		receiveMsg = false;
@@ -218,5 +237,6 @@ public class GameStateManager : MonoBehaviour {
 	public void setPauseState(bool state) {
 		paused = state;
 		playerManager.setPauseState(state);
+		colliderMaker.SetPauseState(state);
 	}
 }

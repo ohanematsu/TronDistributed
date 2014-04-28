@@ -52,6 +52,9 @@ public class PlayerManager : MonoBehaviour{
 	}
 
 	public void SyncGlobalGameState(Dictionary<string, object> message) {
+		gameStateManager.SetCurLogicTime(Convert.ToInt32(message["time"]));
+		Debug.Log("After receiving JOIN_ACK, time is " + gameStateManager.GetCurLogicTime());
+
 		Dictionary<string, object> passedAllUsersGlobalStates = message["globalState"] as Dictionary<string, object>;
 		Debug.Log("Number of user: " + passedAllUsersGlobalStates.Count);
 
@@ -95,8 +98,6 @@ public class PlayerManager : MonoBehaviour{
 				gameStateManager.GetTimeInterval() * (gameStateManager.GetCurLogicTime() - curLogicTime));
 		}
 
-		gameStateManager.SetCurLogicTime(Convert.ToInt32(message["time"]));
-		Debug.Log("After receiving JOIN_ACK, time is " + gameStateManager.GetCurLogicTime ());
 		gameStateManager.setState(GameStateManager.RECEIVED_JOIN_ACK);
 		Debug.Log("After receiving JOIN_ACK, state is " + gameStateManager.GetState ());
 	}
@@ -267,16 +268,23 @@ public class PlayerManager : MonoBehaviour{
 
 	// Initialization
 	void Awake() {
-		knownPlayerUnProcessedMsgList = new Dictionary<string, List<Dictionary<string, object>>>();
+		/*knownPlayerUnProcessedMsgList = new Dictionary<string, List<Dictionary<string, object>>>();
 		unknownPlayerUnProcessedMsgList = new List<Dictionary<string, object>>();
 		Players = new Dictionary<string, Player>();
-		toDeletePlayer = new List<string>();
+		toDeletePlayer = new List<string>();*/
 
 		messageHandlerList.Add(MessageDispatcher.JOIN_GAME_ACK, SyncGlobalGameState);
 		messageHandlerList.Add(MessageDispatcher.ADD_USER,      AddNewPlayer);
 		messageHandlerList.Add(MessageDispatcher.UPDATE_USER,   UpdatePlayer);
 		messageHandlerList.Add(MessageDispatcher.DELETE_USER,   RemovePlayer);
 		messageHandlerList.Add(MessageDispatcher.USER_CRASH,    RemovePlayer);
+	}
+
+	void Start() {
+		knownPlayerUnProcessedMsgList = new Dictionary<string, List<Dictionary<string, object>>>();
+		unknownPlayerUnProcessedMsgList = new List<Dictionary<string, object>>();
+		Players = new Dictionary<string, Player>();
+		toDeletePlayer = new List<string>();
 	}
 	
 	// Called every fixed framerate frame, if the MonoBehaviour is enabled.
