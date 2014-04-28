@@ -9,6 +9,7 @@ public class GameStateManager : MonoBehaviour {
 	private MessageDispatcher messageDispatcher;
 	private MotorController motorController;
 	private InvisibleBoxLocator colliderMaker;
+	private CollisionDetector collisionDetector;
 
 	private int curLogicTime;
 	private string userID;
@@ -29,6 +30,7 @@ public class GameStateManager : MonoBehaviour {
 		InitMessageDispatcher();
 		InitMotorController();
 		InitColliderMaker();
+		InitCollisionDetector();
 
 		// Initiate global values
 		InitGlobalValues();
@@ -193,6 +195,17 @@ public class GameStateManager : MonoBehaviour {
 			Application.LoadLevel(2);
 		}
 		Debug.Log("Get colider maker success!");
+	}
+
+	private void InitCollisionDetector() {
+		// Get Collision Detector
+		collisionDetector = gameObject.GetComponent<CollisionDetector>();
+		if (collisionDetector == null) {
+			Debug.Log("Find collision detector failed!");
+			Application.LoadLevel(2);
+		}
+		collisionDetector.SetGameStateManager(this);
+		Debug.Log("Get collision detector success");
 	}
 
 	private void InitGlobalValues() {

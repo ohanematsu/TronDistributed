@@ -1,7 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class CollisionDetector : MonoBehaviour {
+
+	private GameStateManager gameStateManager;
 
 	void OnControllerColliderHit(ControllerColliderHit hit) {
 		// Debug.DrawRay(hit.point, hit.normal);
@@ -18,17 +21,21 @@ public class CollisionDetector : MonoBehaviour {
 		}
 		Debug.Log(debugInfo);
 
-		// Initiate the connection. If failed, show something and quit
-		NetworkManager networkManager = gameObject.GetComponent<NetworkManager>();
-		if (networkManager == null) {
-			Debug.Log("Cannot find NetworkManager");
-		}
-		Debug.Log("Get network manager success!");
-		if (networkManager.GetSocketState()) {
-			networkManager.closeSocket();
-			Debug.Log("CLOSE!!!!!");
-		}
+		// Send DELETE Message
+		Dictionary<string, object> message = new Dictionary<string, object>();
+		message["type"] = MessageDispatcher.DELETE_USER;
+		message["userID"] = gameStateManager.GetUserID();
+		gameStateManager.GetNetworkManager().writeSocket(message);
+		Debug.Log("DELETE USER message sent out");
+
+		// Close Socket
+		gameStateManager.GetNetworkManager().closeSocket();
+		Debug.Log("Socket closed");
 
 		Application.LoadLevel(2);
+	}
+
+	public void SetGameStateManager(GameStateManager globalGameStateManager) {
+		gameStateManager = globalGameStateManager;
 	}
 }
