@@ -35,7 +35,7 @@ public class MessageDispatcher : MonoBehaviour {
 		
 	private void HandleJoinGameMessage(Dictionary<string, object> message) {
 		Debug.Log("HandleJoinGameMessage");
-
+		
 		// Generate ack message and send
 		string targetUserID = message["userID"] as string;
 		if (targetUserID == gameStateManager.GetUserID()) {
@@ -45,11 +45,15 @@ public class MessageDispatcher : MonoBehaviour {
 		Dictionary<string, object> ackeMessage = gameStateManager.GetPlayerManager().GenerateACKMessage(targetUserID);
 		gameStateManager.GetNetworkManager().writeSocket(ackeMessage);
 
-		SendAddUserMessage(gameStateManager.GetUserID());
+		// Send ADD_USER
+		if (gameStateManager.GetState() == GameStateManager.SENT_JOIN) {
+			SendAddUserMessage(gameStateManager.GetUserID());
+			gameStateManager.SetState(GameStateManager.NORMAL);
+		}
 		SendAddUserMessage(targetUserID);
 
 		// Enable Clock
-		gameStateManager.setPauseState(false);
+		gameStateManager.SetPauseState(false);
 	}
 
 	private void SendAddUserMessage(string userID) {
@@ -118,12 +122,12 @@ public class MessageDispatcher : MonoBehaviour {
 		
 	private void HandlePauseMessage(Dictionary<string, object> message) {
 		Debug.Log("HandlePauseUserMessage");
-		gameStateManager.setPauseState(true);
+		gameStateManager.SetPauseState(true);
 	}
 		
 	private void HandleResumeMessage(Dictionary<string, object> message) {
 		Debug.Log("HandleResumeUserMessage");
-		gameStateManager.setPauseState(false);
+		gameStateManager.SetPauseState(false);
 	}
 
 	private void HandleGameOverMessage(Dictionary<string, object> message) {

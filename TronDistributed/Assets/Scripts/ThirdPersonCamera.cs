@@ -213,5 +213,4 @@ public class ThirdPersonCamera : MonoBehaviour {
 	Vector3 GetCenterOffset() {
 		return centerOffset;
 	}
-
 }

@@ -50,7 +50,6 @@ public class GameStateManager : MonoBehaviour {
 		// Deliver received messages
 		Dictionary<string, object> receiveMessage = networkManager.receive();
 		while (receiveMessage != null) {
-			//Debug.Log("Message from " + (receiveMessage["userID"] as string));
 			Debug.Log("Receive " + receiveMessage["type"] + " message!");
 			messageDispatcher.Dispatch(receiveMessage);
 			receiveMessage = networkManager.receive();
@@ -80,48 +79,10 @@ public class GameStateManager : MonoBehaviour {
 		}
 	}
 
-	public NetworkManager GetNetworkManager() {
-		return networkManager;
-	}
-
-	public PlayerManager GetPlayerManager() {
-		return playerManager;
-	}
-
-	public MessageDispatcher GetMessageDispatcher() {
-		return messageDispatcher;
-	}
-
-	public MotorController GetMotorController() {
-		return motorController;
-	}
-
-	public int GetCurLogicTime() {
-		return curLogicTime;
-	}
-
-	public void SetCurLogicTime(int time) {
-		curLogicTime = time;
-	}
-
-	public void IncrementCurLogicTime() {
-		curLogicTime++;
-	}
-
-	public string GetUserID() {
-		return userID;
-	}
-
-	public int GetState() {
-		return state;
-	}
-
-	public void setState(int newState) {
-		state = newState;
-	}
-
-	public float GetTimeInterval() {
-		return timeInterval;
+	void OnDestroy() {
+		if (networkManager.GetSocketState()) {
+			networkManager.closeSocket();
+		}
 	}
 
 	private void InitNetworkManager() {
@@ -225,11 +186,7 @@ public class GameStateManager : MonoBehaviour {
 		timeInterval = 0.02f;
 
 		// Initiate pause state
-		setPauseState(true);
-	}
-
-	public float getMoveSpeed() {
-		return moveSpeed;
+		SetPauseState(true);
 	}
 
 	private void SendJoinGameMessage() {
@@ -242,14 +199,62 @@ public class GameStateManager : MonoBehaviour {
 		Debug.Log("Send JOIN_GAME message");
 
 		// Set state to paused to wait for response
-		setPauseState(true);
+		SetPauseState(true);
 
 		state = SENT_JOIN;
 	}
 
-	public void setPauseState(bool state) {
+	public void SetPauseState(bool state) {
 		paused = state;
 		playerManager.setPauseState(state);
 		colliderMaker.SetPauseState(state);
+	}
+
+	public NetworkManager GetNetworkManager() {
+		return networkManager;
+	}
+	
+	public PlayerManager GetPlayerManager() {
+		return playerManager;
+	}
+	
+	public MessageDispatcher GetMessageDispatcher() {
+		return messageDispatcher;
+	}
+	
+	public MotorController GetMotorController() {
+		return motorController;
+	}
+	
+	public int GetCurLogicTime() {
+		return curLogicTime;
+	}
+	
+	public void SetCurLogicTime(int time) {
+		curLogicTime = time;
+	}
+	
+	public void IncrementCurLogicTime() {
+		curLogicTime++;
+	}
+	
+	public string GetUserID() {
+		return userID;
+	}
+	
+	public int GetState() {
+		return state;
+	}
+	
+	public void SetState(int newState) {
+		state = newState;
+	}
+	
+	public float GetTimeInterval() {
+		return timeInterval;
+	}
+
+	public float GetMoveSpeed() {
+		return moveSpeed;
 	}
 }

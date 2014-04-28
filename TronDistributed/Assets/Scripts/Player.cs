@@ -9,8 +9,8 @@ public class Player {
 	//private bool isLocal;
 	private float moveSpeed;
 
-	private string userId;
-	private int initLogicTime;
+	//private string userId;
+	//private int initLogicTime;
 	private Vector3 initPosition;
 	private float initHorizontalDir;
 	private float initVerticalDir;
@@ -29,10 +29,10 @@ public class Player {
 		moveSpeed = speed;
 		Debug.Log("Init remote speed = " + moveSpeed);
 
-		userId = addUserMessage["userID"] as string;
+		//userId = addUserMessage["userID"] as string;
 		initHorizontalDir = Convert.ToSingle(addUserMessage["horizontalDir"]);
 		initVerticalDir = Convert.ToSingle(addUserMessage["verticalDir"]);
-		initLogicTime = Convert.ToInt32(addUserMessage["time"]);
+		//initLogicTime = Convert.ToInt32(addUserMessage["time"]);
 
 		float initPosX = Convert.ToSingle(addUserMessage["posX"]);
 		float initPosY = Convert.ToSingle(addUserMessage["posY"]);
@@ -86,7 +86,7 @@ public class Player {
 		// Parse message
 		float newHorizontalDir = Convert.ToSingle(message["horizontalDir"]);
 		float newVerticalDir = Convert.ToSingle(message["verticalDir"]);
-		int newLogicTime = Convert.ToInt32(message["time"]);
+		//int newLogicTime = Convert.ToInt32(message["time"]);
 
 		// Update player's direction
 		curHorizontalDir = newHorizontalDir;
@@ -94,6 +94,9 @@ public class Player {
 	
 		// Update position and rotation
 		// UpdateBasedOnPrediction(newLogicTime, fixedDeltaTime);
+
+		// Store message
+		processedMessage.Add(message);
 	}
 
 	public List<Dictionary<string, object>> GetProcessedMessage() {

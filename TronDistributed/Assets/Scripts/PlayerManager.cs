@@ -98,7 +98,7 @@ public class PlayerManager : MonoBehaviour{
 				gameStateManager.GetTimeInterval() * (gameStateManager.GetCurLogicTime() - curLogicTime));
 		}
 
-		gameStateManager.setState(GameStateManager.RECEIVED_JOIN_ACK);
+		gameStateManager.SetState(GameStateManager.RECEIVED_JOIN_ACK);
 		Debug.Log("After receiving JOIN_ACK, state is " + gameStateManager.GetState ());
 	}
 
@@ -142,20 +142,19 @@ public class PlayerManager : MonoBehaviour{
 		Player newPlayer = new Player();
 		newPlayer.SetStartState(new GameObject(), otherPlayerSpeed, message);
 		Players.Add(gameStateManager.GetUserID(), newPlayer);
-		//newPlayer.GetProcessedMessage().Add(message);
 		Debug.Log("Init local user complete");
 
 		// Enable update
 		Debug.Log("After receiving ADD_USER, state is " + gameStateManager.GetState());
 		if (gameStateManager.GetState() == GameStateManager.RECEIVED_JOIN_ACK) {
-			gameStateManager.setState(GameStateManager.NORMAL);
-			gameStateManager.setPauseState(false);
+			gameStateManager.SetState(GameStateManager.NORMAL);
+			gameStateManager.SetPauseState(false);
 			Debug.Log("Enable update");
 		}
 	}
 
 	private void InitRemotePlayer(string userID, Dictionary<string, object> message) {
-		Debug.Log("Prepare to init remote user");
+		Debug.Log("Prepare to init remote user: " + userID);
 
 		float initPosX = Convert.ToSingle(message["posX"]);
 		float initPosY = Convert.ToSingle(message["posY"]);
@@ -174,9 +173,8 @@ public class PlayerManager : MonoBehaviour{
 		// Create player
 		//float curTime = Time.time;
 		Player newPlayer = new Player();
-		newPlayer.SetStartState(playerPrefab, gameStateManager.getMoveSpeed(), message);
+		newPlayer.SetStartState(playerPrefab, gameStateManager.GetMoveSpeed(), message);
 		Players.Add(userID, newPlayer);
-		//newPlayer.GetProcessedMessage().Add(message);
 		Debug.Log("Initate player " + userID + " complete");
 	}
 
@@ -201,7 +199,7 @@ public class PlayerManager : MonoBehaviour{
 		// Parse message
 		float horizontalDir = Convert.ToSingle(message["horizontalDir"]);
 		float verticalDir = Convert.ToSingle(message["verticalDir"]);
-		int curLogicTime = Convert.ToInt32(message["time"]);
+		//int curLogicTime = Convert.ToInt32(message["time"]);
 		
 		// Update local player
 		gameStateManager.GetMotorController().UpdateDirection(horizontalDir, verticalDir);
@@ -216,7 +214,7 @@ public class PlayerManager : MonoBehaviour{
 		Debug.Log("Prepare to update remote player");
 		// Update remote player
 		Players[userID].UpdateBasedOnNetwork(message, Time.fixedDeltaTime);
-		Players[userID].GetProcessedMessage().Add(message);
+		//Players[userID].GetProcessedMessage().Add(message);
 		Debug.Log("Update remote player complete");
 	}
 
@@ -324,7 +322,7 @@ public class PlayerManager : MonoBehaviour{
 		unknownPlayerUnProcessedMsgList.Clear();
 
 		if (toDeletePlayer.Count != 0) {
-			DestroyPlayers ();
+			DestroyPlayers();
 		}
 	}
 }
