@@ -23,6 +23,8 @@ public class GameStateManager : MonoBehaviour {
 	public static int SENT_JOIN = 1;
 	public static int RECEIVED_JOIN_ACK = 2;
 
+	private 
+
 	void Start() {
 		// Get all components
 		InitNetworkManager();
@@ -179,7 +181,7 @@ public class GameStateManager : MonoBehaviour {
 		userID = networkManager.GetUserID();
 
 		// Initiate moveSpeed 
-		moveSpeed = 2.0f;
+		moveSpeed = 4.0f;
 
 		state = NORMAL;
 

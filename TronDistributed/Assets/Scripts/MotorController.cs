@@ -126,7 +126,7 @@ public class MotorController : MonoBehaviour {
 		UpdateDirection(initHorizontalDir, initVerticalDir);
 		//UpdateSmoothedMovementDirection();
 		transform.rotation = Quaternion.LookRotation(moveDirection);
-		mainCamera.transform.position = initPos + cameraMotorDistance;
+		//mainCamera.transform.position = initPos + cameraMotorDistance;
 	}
 
 	public void UpdateDirection(float newHorizontalDir, float newVerticalDir) {
@@ -180,7 +180,7 @@ public class MotorController : MonoBehaviour {
 		}*/
 
 		// Update Camera Position
-		mainCamera.transform.position += movement;
+		//mainCamera.transform.position += movement;
 	}
 
 	private void UpdateSmoothedMovementDirection() {
