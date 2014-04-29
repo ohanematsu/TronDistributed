@@ -153,7 +153,7 @@ public class MotorController : MonoBehaviour {
 		float deltaTime = (newLogicTime - lastProcessedTime) * fixedDeltaTime;
 		Vector3 moveDirection = new Vector3(curHorizontalDir, 0, curVerticalDir);
 		Vector3 movement = gameStateManager.GetMoveSpeed() * moveDirection * deltaTime;
-		Debug.Log("Local Movement: " + movement.x + "," + movement.y + "," + movement.z + ", speed = " + gameStateManager.GetMoveSpeed());
+		//Debug.Log("Local Movement: " + movement.x + "," + movement.y + "," + movement.z + ", speed = " + gameStateManager.GetMoveSpeed());
 		
 		// Move the controller
 		CharacterController controller = GetComponent<CharacterController>();

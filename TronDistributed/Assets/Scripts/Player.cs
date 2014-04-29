@@ -46,13 +46,13 @@ public class Player {
 	}
 	
 	public void UpdateBasedOnPrediction(int newLogicTime, float fixedDeltaTime) {
-		Debug.Log("Update remote user based on prediction");
+		//Debug.Log("Update remote user based on prediction");
 
 		// Calculate movement
 		float deltaTime = fixedDeltaTime * (newLogicTime - lastProcessedLogicTime);
 		Vector3 moveDirection = new Vector3(curHorizontalDir, 0, curVerticalDir);
 		Vector3 movement = moveSpeed * moveDirection * deltaTime;
-		Debug.Log("Remote Movement: " + movement.x + "," + movement.y + "," + movement.z + ", speed = " + moveSpeed);
+		//Debug.Log("Remote Movement: " + movement.x + "," + movement.y + "," + movement.z + ", speed = " + moveSpeed);
 
 		// Update player's position
 		Vector3 oldPos = motor.transform.position;

@@ -13,6 +13,7 @@ public class MessageDispatcher : MonoBehaviour {
 	public static string UPDATE_USER =   "update";         // Update player
 	public static string DELETE_USER =   "delete_user";    // Delete a user from the game
 	public static string USER_CRASH =    "crash";          // A remote user crashes
+	public static string ALIVE_LIST =    "alive_list";     // Super node die
 	public static string PAUSE =         "pause_game";     // Pause the game
 	public static string RESUME =        "resume_game";    // Resume the game
 	public static string GAME_OVER =     "game_over";      // Game over         
@@ -198,8 +199,12 @@ public class MessageDispatcher : MonoBehaviour {
 
 	private void HandleGameOverMessage(Dictionary<string, object> message) {
 		Debug.Log("HandleGameOverMessage");
-		//TODO
 		Application.LoadLevel(2);
+	}
+
+	private void HandleAliveListMessgae(Dictionary<string, object> message) {
+		Debug.Log("HandleAliveListMessgae");
+		EnqueuePlayerManagerUnProcessedMessageQueue(message);
 	}
 
 	private void EnqueuePlayerManagerUnProcessedMessageQueue(Dictionary<string, object> message) {

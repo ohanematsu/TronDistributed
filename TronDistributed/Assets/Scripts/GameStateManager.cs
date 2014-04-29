@@ -23,8 +23,6 @@ public class GameStateManager : MonoBehaviour {
 	public static int SENT_JOIN = 1;
 	public static int RECEIVED_JOIN_ACK = 2;
 
-	private 
-
 	void Start() {
 		// Get all components
 		InitNetworkManager();
@@ -48,7 +46,7 @@ public class GameStateManager : MonoBehaviour {
 		if (!receiveMsg) {
 			return ;
 		}
-
+		
 		// Deliver received messages
 		Dictionary<string, object> receiveMessage = networkManager.receive();
 		while (receiveMessage != null) {
@@ -56,9 +54,28 @@ public class GameStateManager : MonoBehaviour {
 			messageDispatcher.Dispatch(receiveMessage);
 			receiveMessage = networkManager.receive();
 		}
+		
+		if (!paused) {
+			IncrementCurLogicTime ();
+		}
+	}
+
+	void Update() {
+
+		if (!receiveMsg) {
+			return ;
+		}
+		/*
+		// Deliver received messages
+		Dictionary<string, object> receiveMessage = networkManager.receive();
+		while (receiveMessage != null) {
+			Debug.Log("Receive " + receiveMessage["type"] + " message!");
+			messageDispatcher.Dispatch(receiveMessage);
+			receiveMessage = networkManager.receive();
+		}*/
 
 		if (!paused) {
-			IncrementCurLogicTime();
+			//IncrementCurLogicTime();
 
 			// Detect keyboard event and send message to its own playermanager
 			float verticalDir = Input.GetAxisRaw("Vertical");   

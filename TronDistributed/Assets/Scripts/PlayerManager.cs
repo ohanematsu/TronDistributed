@@ -222,6 +222,22 @@ public class PlayerManager : MonoBehaviour{
 		Debug.Log("Update remote player complete");
 	}
 
+	public void FindDeadPlayer(Dictionary<string, object> message) {
+		HashSet<string> currentUsers = new HashSet<string>(Players.Keys);
+		Debug.Log("Current User Count: " + currentUsers.Count);
+		List<object> aliveUsers = message["list"] as List<object>;
+		foreach (string userID in aliveUsers) {
+			if (currentUsers.Contains(userID)) {
+				currentUsers.Remove(userID);
+			}
+		}
+
+		Debug.Log("Dead User Count: " + currentUsers.Count);
+		foreach (string deadUserID in currentUsers) {
+			DestroyPlayers(deadUserID);
+		}
+	}
+
 	public void RemovePlayer(Dictionary<string, object> message) {
 		Debug.Log("Prepare to remove player");
 		string userID = message["userID"] as string;
@@ -231,29 +247,19 @@ public class PlayerManager : MonoBehaviour{
 		}
 	
 		// Destroy
+		DestroyPlayers(userID);
+	}
+
+	private void DestroyPlayers(string userID) {
+		// Delete player
 		List<GameObject> trailColliders = Players[userID].GetAllColliders();
 		foreach (GameObject collider in trailColliders) {
 			Destroy(collider);
 		}
 		Destroy(Players[userID].GetPrefab());
 		Players.Remove(userID);
-		Debug.Log("Add to todelete player list");
-	}
-
-	private void DestroyPlayers() {
-		foreach (string userID in toDeletePlayer) {
-			// Delete player
-			List<GameObject> trailColliders = Players[userID].GetAllColliders();
-			foreach (GameObject collider in trailColliders) {
-				Destroy(collider);
-			}
-			Destroy(Players[userID].GetPrefab());
-			Players.Remove(userID);
-			knownPlayerUnProcessedMsgList.Remove(userID);
-			Debug.Log("Remove player " + userID + " complete");
-		}
-
-		toDeletePlayer.Clear();
+		knownPlayerUnProcessedMsgList.Remove(userID);
+		Debug.Log("Remove player " + userID + " complete");
 	}
 
 	public Dictionary<string, object> GenerateACKMessage(string targetUserId) {
@@ -286,6 +292,7 @@ public class PlayerManager : MonoBehaviour{
 		messageHandlerList.Add(MessageDispatcher.UPDATE_USER,   UpdatePlayer);
 		messageHandlerList.Add(MessageDispatcher.DELETE_USER,   RemovePlayer);
 		messageHandlerList.Add(MessageDispatcher.USER_CRASH,    RemovePlayer);
+		messageHandlerList.Add(MessageDispatcher.ALIVE_LIST,    FindDeadPlayer);
 	}
 
 	void Start() {
@@ -298,7 +305,7 @@ public class PlayerManager : MonoBehaviour{
 	}
 	
 	// Called every fixed framerate frame, if the MonoBehaviour is enabled.
-	void FixedUpdate () {
+	void Update () {
 		if (paused && gameStateManager.GetState() == GameStateManager.NORMAL ) {
 			return ;
 		}
