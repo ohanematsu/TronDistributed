@@ -23,6 +23,9 @@ public class GameStateManager : MonoBehaviour {
 	public static int SENT_JOIN = 1;
 	public static int RECEIVED_JOIN_ACK = 2;
 
+	private float lastSentHonrizontalDir;
+	private float lastSentVerticalDir;
+
 	void Start() {
 		// Get all components
 		InitNetworkManager();
@@ -77,7 +80,7 @@ public class GameStateManager : MonoBehaviour {
 		if (!paused) {
 			//IncrementCurLogicTime();
 
-			// Detect keyboard event and send message to its own playermanager
+			// Detect keyboard event and decide if need sending UPDATE message
 			float verticalDir = Input.GetAxisRaw("Vertical");   
 			float horizontalDir = Input.GetAxisRaw("Horizontal");
 			if (verticalDir == 0.0f && horizontalDir == 0.0f) {
@@ -86,7 +89,11 @@ public class GameStateManager : MonoBehaviour {
 			if (verticalDir == motorController.GetVerticalDir() && horizontalDir == motorController.GetHorizontalDir()) {
 				return ;
 			}
+			if (verticalDir == lastSentVerticalDir && horizontalDir == lastSentHonrizontalDir) {
+				return ;
+			}
 
+			// Send UPDATE message
 			Dictionary<string, object> message = new Dictionary<string, object>();
 			message["type"] = (object)MessageDispatcher.UPDATE_USER;
 			message["userID"] = (object)userID;
@@ -95,6 +102,10 @@ public class GameStateManager : MonoBehaviour {
 			message["time"] = (object)curLogicTime;
 			networkManager.writeSocket(message);
 			Debug.Log("Send local update message");
+
+			// Update last sent direction
+			lastSentHonrizontalDir = horizontalDir;
+			lastSentVerticalDir = verticalDir;
 		}
 	}
 
@@ -211,6 +222,9 @@ public class GameStateManager : MonoBehaviour {
 
 		// Initiate pause state
 		SetPauseState(true);
+
+		lastSentHonrizontalDir = 0.0f;
+		lastSentVerticalDir = 0.0f;
 	}
 
 	private void SendJoinGameMessage() {
