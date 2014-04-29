@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
+using System;
 
 public class MessageDispatcher : MonoBehaviour {
 
@@ -37,18 +38,21 @@ public class MessageDispatcher : MonoBehaviour {
 		
 	private void HandleJoinGameMessage(Dictionary<string, object> message) {
 		Debug.Log("HandleJoinGameMessage");
-		
-		// Generate ack message and send
+
+		// Check message's receiver first.
+		// If it receives a JOIN_GAME message sent from itself, discard it
 		string targetUserID = message["userID"] as string;
 		if (targetUserID == gameStateManager.GetUserID()) {
-			// If it receives a JOIN_GAME message sent from itself, discard it
 			return ;
 		}
+
+		// Generate ack message and send
 		Dictionary<string, object> ackeMessage = gameStateManager.GetPlayerManager().GenerateACKMessage(targetUserID);
 		gameStateManager.GetNetworkManager().writeSocket(ackeMessage);
 
-		// Send ADD_USER
+		// Send ADD_USER message
 		if (gameStateManager.GetState() == GameStateManager.SENT_JOIN) {
+			// If the super node has not been added to the game, send a message to add itself
 			SendAddUserMessage(gameStateManager.GetUserID());
 			gameStateManager.SetState(GameStateManager.NORMAL);
 		}
@@ -60,11 +64,11 @@ public class MessageDispatcher : MonoBehaviour {
 
 	private void SendAddUserMessage(string userID) {
 		// Generate the initial position and direction
-		Vector3 startPos = new Vector3(Random.Range(1.0f, 63.0f), 1.1f, Random.Range(1.0f, 63.0f));
+		Vector3 startPos = new Vector3(UnityEngine.Random.Range(1.0f, 63.0f), 1.1f, UnityEngine.Random.Range(1.0f, 63.0f));
 		//Vector3 startPos = new Vector3(initX, 1.1f, 10.0f);
 		float h, v;
 
-		float tmp = Random.Range(0.0f, 300.0f);
+		float tmp = UnityEngine.Random.Range(0.0f, 300.0f);
 		if (0.0f <= tmp && tmp < 100.0f) {
 			h = -1.0f;
 		} else if (100.0f <= tmp && tmp < 200.0f) {
@@ -75,7 +79,7 @@ public class MessageDispatcher : MonoBehaviour {
 		if (h != 0.0f) {
 			v = 0.0f;
 		} else {
-			tmp = Random.Range(0.0f, 200.0f);
+			tmp = UnityEngine.Random.Range(0.0f, 200.0f);
 			if (0.0f <= tmp && tmp < 100.0f) {
 				v = -1.0f;
 			} else {
@@ -104,9 +108,39 @@ public class MessageDispatcher : MonoBehaviour {
 	private void HandleJoinGameACKMessage(Dictionary<string, object> message) {
 		Debug.Log("HandleJoinGameACKMessage");
 		string targetUserID = message["userID"] as string;
-		if (targetUserID == gameStateManager.GetUserID ()) {
-			EnqueuePlayerManagerUnProcessedMessageQueue(message);
+
+		// If the user isn't the target user, discard this message
+		if (targetUserID != gameStateManager.GetUserID ()) {
+			return ;
 		}
+			
+		// Sync local logic time to global logic time
+		gameStateManager.SetCurLogicTime(Convert.ToInt32(message["time"]));
+		Debug.Log("After receiving JOIN_ACK, time is " + gameStateManager.GetCurLogicTime());
+
+		// Parse global state data
+		Dictionary<string, object> passedAllUsersGlobalStates = message["globalState"] as Dictionary<string, object>;
+		Debug.Log("Number of user: " + passedAllUsersGlobalStates.Count);
+
+		// Enqueue all messages
+		foreach (KeyValuePair<string, object> pair in passedAllUsersGlobalStates) {
+			/* For debug */
+			string userID = pair.Key as string;
+			Debug.Log("Sync User: " + userID);
+
+			List<object> messages = pair.Value as List<object>;
+			foreach (object msg in messages) {
+				Dictionary<string, object> processedMessage = msg as Dictionary<string, object>;
+				EnqueuePlayerManagerUnProcessedMessageQueue(processedMessage);
+			}
+		}
+
+		// Update state
+		gameStateManager.SetState(GameStateManager.RECEIVED_JOIN_ACK);
+		Debug.Log("After receiving JOIN_ACK, state is " + gameStateManager.GetState());
+
+		// Enable Clock
+		gameStateManager.SetPauseState(false);
 	}
 
 	private void HandleAddUserMessage(Dictionary<string, object> message) {
