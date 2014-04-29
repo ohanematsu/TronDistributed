@@ -130,9 +130,20 @@ public class MessageDispatcher : MonoBehaviour {
 			Debug.Log("Sync User: " + userID);
 
 			List<object> messages = pair.Value as List<object>;
+			int cc = 0;
 			foreach (object msg in messages) {
 				Dictionary<string, object> processedMessage = msg as Dictionary<string, object>;
 				EnqueuePlayerManagerUnProcessedMessageQueue(processedMessage);
+
+				/* dirty fix */
+				if (cc == 0) {
+					Dictionary<string, object> tmp = new Dictionary<string, object>();
+					tmp["type"] = "dirtyfix";
+					for (int i = 0; i < 8; i++) {
+						EnqueuePlayerManagerUnProcessedMessageQueue(tmp);
+					}
+				}
+				cc = 1;
 			}
 		}
 
@@ -147,6 +158,17 @@ public class MessageDispatcher : MonoBehaviour {
 	private void HandleAddUserMessage(Dictionary<string, object> message) {
 		Debug.Log("HandleAddUserMessage");
 		EnqueuePlayerManagerUnProcessedMessageQueue(message);
+		string userID = message ["userID"] as String;
+		if (userID == gameStateManager.GetUserID ()) {
+			return ;
+		}
+
+		/* dirty fix */
+		Dictionary<string, object> tmp = new Dictionary<string, object>();
+		tmp["type"] = "dirtyfix";
+		for (int i = 0; i < 8; i++) {
+			EnqueuePlayerManagerUnProcessedMessageQueue(tmp);
+		}
 	}
 		
 	private void HandleUpdateUserMessage(Dictionary<string, object> message) {
