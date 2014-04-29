@@ -178,12 +178,12 @@ public class MessageDispatcher : MonoBehaviour {
 		
 	private void HandleDeleteUserMessage(Dictionary<string, object> message) {
 		Debug.Log("HandleDeleteUserMessage");
-		EnqueuePlayerManagerUnProcessedMessageQueue(message);
+		gameStateManager.GetPlayerManager().RemovePlayer(message);
 	}
 		
 	private void HandleUserCrashMessage(Dictionary<string, object> message) {
 		Debug.Log("HandleUserCrashMessage");
-		EnqueuePlayerManagerUnProcessedMessageQueue(message);
+		gameStateManager.GetPlayerManager().RemovePlayer(message);
 	}
 		
 	private void HandlePauseMessage(Dictionary<string, object> message) {

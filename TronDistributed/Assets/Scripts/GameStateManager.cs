@@ -186,7 +186,7 @@ public class GameStateManager : MonoBehaviour {
 		userID = networkManager.GetUserID();
 
 		// Initiate moveSpeed 
-		moveSpeed = 8.0f;
+		moveSpeed = 5.0f;
 
 		state = NORMAL;
 

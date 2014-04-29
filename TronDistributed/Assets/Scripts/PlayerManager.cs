@@ -230,7 +230,13 @@ public class PlayerManager : MonoBehaviour{
 			return ;
 		}
 	
-		toDeletePlayer.Add(userID);
+		// Destroy
+		List<GameObject> trailColliders = Players[userID].GetAllColliders();
+		foreach (GameObject collider in trailColliders) {
+			Destroy(collider);
+		}
+		Destroy(Players[userID].GetPrefab());
+		Players.Remove(userID);
 		Debug.Log("Add to todelete player list");
 	}
 
