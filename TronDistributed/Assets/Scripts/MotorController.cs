@@ -119,7 +119,7 @@ public class MotorController : MonoBehaviour {
 		transform.rotation = Quaternion.LookRotation(moveDirection);
 
 		// Reset camera position
-		mainCamera.transform.position = initPos + cameraMotorDistance;
+		//mainCamera.transform.position = initPos + cameraMotorDistance;
 
 		// Init last processed time
 		lastProcessedTime = initLogicTime;
@@ -163,7 +163,7 @@ public class MotorController : MonoBehaviour {
 		transform.rotation = Quaternion.LookRotation(moveDirection);
 
 		// Update Camera Position
-		mainCamera.transform.position += movement;
+		//mainCamera.transform.position += movement;
 
 		// Update Time
 		lastProcessedTime = newLogicTime;

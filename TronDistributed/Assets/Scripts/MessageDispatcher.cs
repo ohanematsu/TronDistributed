@@ -64,11 +64,17 @@ public class MessageDispatcher : MonoBehaviour {
 
 	private void SendAddUserMessage(string userID) {
 		// Generate the initial position and direction
-		Vector3 startPos = new Vector3(UnityEngine.Random.Range(1.0f, 63.0f), 1.1f, UnityEngine.Random.Range(1.0f, 63.0f));
-		//Vector3 startPos = new Vector3(initX, 1.1f, 10.0f);
-		float h, v;
 
-		float tmp = UnityEngine.Random.Range(0.0f, 300.0f);
+		/* For test*/
+		Vector3 startPos = new Vector3(initX, 1.1f, 10.0f);
+		float h, v;
+		h = 0.0f;
+		v = 1.0f;
+		initX += 10.0f;
+
+		//Vector3 startPos = new Vector3(UnityEngine.Random.Range(1.0f, 63.0f), 1.1f, UnityEngine.Random.Range(1.0f, 63.0f));
+		//float h, v;
+		/*float tmp = UnityEngine.Random.Range(0.0f, 300.0f);
 		if (0.0f <= tmp && tmp < 100.0f) {
 			h = -1.0f;
 		} else if (100.0f <= tmp && tmp < 200.0f) {
@@ -85,10 +91,7 @@ public class MessageDispatcher : MonoBehaviour {
 			} else {
 				v = 1.0f;
 			}
-		}
-
-		//h = 0.0f;
-		//v = 1.0f;
+		}*/
 		
 		// Generate add new user message and send
 		Dictionary<string, object> addUserMessage = new Dictionary<string, object>();
@@ -101,8 +104,6 @@ public class MessageDispatcher : MonoBehaviour {
 		addUserMessage.Add("verticalDir", v);
 		addUserMessage.Add("time", gameStateManager.GetCurLogicTime());
 		gameStateManager.GetNetworkManager().writeSocket(addUserMessage);
-
-		//initX += 10.0f;
 	}
 
 	private void HandleJoinGameACKMessage(Dictionary<string, object> message) {
