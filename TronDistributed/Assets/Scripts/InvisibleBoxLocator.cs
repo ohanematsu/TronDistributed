@@ -10,7 +10,7 @@ public class InvisibleBoxLocator : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		offset = new Vector3(0, 0, -2.0f);
-		lastWallWorldPos = transform.TransformPoint(gameObject.transform.localPosition + offset);
+		//lastWallWorldPos = transform.TransformPoint(gameObject.transform.localPosition + offset);
 		paused = true;
 	}
 	
@@ -24,11 +24,16 @@ public class InvisibleBoxLocator : MonoBehaviour {
 
 	void PutCollider()
 	{
-		GameObject wall = new GameObject("TrailCollider");
-
 		Vector3 newWallWorldPos = transform.TransformPoint(gameObject.transform.localPosition + offset);
+		if (newWallWorldPos == lastWallWorldPos) {
+		}
+
+		GameObject wall = new GameObject("TrailCollider");
 		wall.transform.position = Vector3.Lerp(newWallWorldPos, lastWallWorldPos, 0.5f);
-		wall.transform.LookAt(newWallWorldPos); // Rotates the transform so the forward vector points at target's current position.
+		//wall.transform.LookAt(newWallWorldPos); // Rotates the transform so the forward vector points at target's current position.
+
+		Debug.Log ("Old position x: " + lastWallWorldPos.x + ", y: " + lastWallWorldPos.y + ", z: " + lastWallWorldPos.z);
+		Debug.Log ("New position x: " + newWallWorldPos.x + ", y: " + newWallWorldPos.y + ", z: " + newWallWorldPos.z);
 
 		BoxCollider boxCollider = wall.AddComponent("BoxCollider") as BoxCollider;
 		if (newWallWorldPos.x == lastWallWorldPos.x) { // If motor don't change its horizontal direction
@@ -42,5 +47,8 @@ public class InvisibleBoxLocator : MonoBehaviour {
 
 	public void SetPauseState(bool state) {
 		paused = state;
+		if (state) {
+			lastWallWorldPos = transform.TransformPoint(gameObject.transform.localPosition + offset);
+		}
 	}
 }

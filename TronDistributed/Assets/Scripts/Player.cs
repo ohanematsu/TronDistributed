@@ -106,8 +106,14 @@ public class Player {
 	private void CreateTrailCollider(Vector3 oldPos) {
 		GameObject trailCollider = new GameObject("TrailCollider");
 		Vector3 newPos = motor.transform.position;
+		if (oldPos == newPos) {
+			return ;
+		}
 		trailCollider.transform.position = Vector3.Lerp(oldPos, newPos, 0.5f);
-		trailCollider.transform.LookAt(newPos); // Rotates the transform so the forward vector points at target's current position.
+		//trailCollider.transform.LookAt(newPos); // Rotates the transform so the forward vector points at target's current position.
+
+		Debug.Log ("Old position x: " + oldPos.x + ", y: " + oldPos.y + ", z: " + oldPos.z);
+		Debug.Log ("New position x: " + newPos.x + ", y: " + newPos.y + ", z: " + newPos.z);
 			
 		BoxCollider boxCollider = trailCollider.AddComponent("BoxCollider") as BoxCollider;
 		if (newPos.x == oldPos.x) { // If motor don't change its horizontal direction
