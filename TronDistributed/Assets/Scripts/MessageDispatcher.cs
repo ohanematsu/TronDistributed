@@ -202,7 +202,7 @@ public class MessageDispatcher : MonoBehaviour {
 		Application.LoadLevel(2);
 	}
 
-	private void HandleAliveListMessgae(Dictionary<string, object> message) {
+	private void HandleAliveListMessage(Dictionary<string, object> message) {
 		Debug.Log("HandleAliveListMessgae");
 		EnqueuePlayerManagerUnProcessedMessageQueue(message);
 	}
@@ -222,5 +222,6 @@ public class MessageDispatcher : MonoBehaviour {
 		messageHandlerList.Add(PAUSE,         HandlePauseMessage);
 		messageHandlerList.Add(RESUME,        HandleResumeMessage);
 		messageHandlerList.Add(GAME_OVER,     HandleGameOverMessage);
+		messageHandlerList.Add(ALIVE_LIST,    HandleAliveListMessage);
 	}
 }
