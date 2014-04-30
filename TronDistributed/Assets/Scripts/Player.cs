@@ -21,6 +21,8 @@ public class Player {
 
 	private InvisibleColliderFactory colliderFactory;
 
+	private Vector3 colliderPosOffset;
+
 	public void SetStartState(GameObject prefab, float speed, Dictionary<string, object> addUserMessage,
 	                          InvisibleColliderFactory invisibleColliderFactory) {
 		motor = prefab;
@@ -50,6 +52,8 @@ public class Player {
 		processedMessage = new List<Dictionary<string, object>>();
 		processedMessage.Add(addUserMessage);
 
+		colliderPosOffset = new Vector3(0, 0, -2.0f);
+
 		CreateTrailCollider();
 	}
 	
@@ -64,14 +68,16 @@ public class Player {
 
 		// Update player's position
 		Vector3 oldPos = motor.transform.position;
+		Vector3 oldColliderPos = motor.transform.TransformPoint(colliderPosOffset);
 		motor.transform.position = oldPos + movement;
+		Vector3 newColliderPos = motor.transform.TransformPoint(colliderPosOffset);
 
 		// Update player's roation
 		motor.transform.rotation = Quaternion.LookRotation(moveDirection);
 
 		// Create invisible colliders in trail
 		//CreateTrailCollider(oldPos);
-		UpdateLastCollider(oldPos, motor.transform.position);
+		UpdateLastCollider(oldColliderPos, newColliderPos);
 
 		// Update last processed time
 		lastProcessedLogicTime = newLogicTime;
@@ -112,8 +118,8 @@ public class Player {
 		return processedMessage;
 	}
 
-	private void UpdateLastCollider(Vector3 oldPos, Vector3 newPos) {
-		if (oldPos == newPos) {
+	private void UpdateLastCollider(Vector3 oldColliderPos, Vector3 newColliderPos) {
+		if (oldColliderPos == newColliderPos) {
 			return ;
 		}
 
@@ -123,12 +129,13 @@ public class Player {
 
 		GameObject trailCollider = trailColliders[trailColliders.Count - 1];
 		if (trailCollider != null) {
-			colliderFactory.UpdateCollider(trailCollider, oldPos, newPos, curHorizontalDir, curVerticalDir);
+			colliderFactory.UpdateCollider(trailCollider, oldColliderPos, newColliderPos, curHorizontalDir, curVerticalDir);
 		}
 	}
 
 	private void CreateTrailCollider() {
-		GameObject newTrailCollider = colliderFactory.CreateCollider(motor.transform.position);
+		Vector3 colliderPos = motor.transform.TransformPoint(colliderPosOffset);
+		GameObject newTrailCollider = colliderFactory.CreateCollider(colliderPos);
 		trailColliders.Add(newTrailCollider);
 		Debug.Log("After adding a new collider, now this player has " + trailColliders.Count + " colliders");
 	}
