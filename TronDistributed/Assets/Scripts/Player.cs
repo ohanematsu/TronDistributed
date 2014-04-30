@@ -57,7 +57,7 @@ public class Player {
 
 		CreateTrailCollider();
 	}
-	
+
 	public void UpdateBasedOnPrediction(int newLogicTime, float fixedDeltaTime) {
 		//Debug.Log("Update remote user based on prediction");
 
@@ -114,7 +114,7 @@ public class Player {
 		return processedMessage;
 	}
 
-	private void UpdateLastCollider(Vector3 newColliderPos, float extendsion) {
+	public void UpdateLastCollider(Vector3 newColliderPos, float extendsion) {
 		if (trailColliders.Count == 0) {
 			return ;
 		}
@@ -126,7 +126,7 @@ public class Player {
 		}
 	}
 
-	private void CreateTrailCollider() {
+	public void CreateTrailCollider() {
 		Vector3 colliderPos = motor.transform.TransformPoint(colliderPosOffset);
 		GameObject newTrailCollider = colliderFactory.CreateCollider(colliderPos);
 		trailColliders.Add(newTrailCollider);

@@ -75,6 +75,11 @@ public class MotorController : MonoBehaviour {
 
 	private int lastProcessedTime = 0;
 
+	private List<GameObject> trailColliders;
+	private InvisibleColliderFactory colliderFactory;
+	private Vector3 colliderPosOffset;
+	private Vector3 lastColliderInitPos;
+
 	// Use this for initialization
 	void Awake (){
 		//moveDirection = transform.TransformDirection(Vector3.forward);
@@ -99,6 +104,8 @@ public class MotorController : MonoBehaviour {
 			Debug.Log("No run animation found. Turning off animations.");
 		}
 
+		colliderPosOffset = new Vector3(0, 0, -2.0f);
+
 		// Calculate the distance between camera and player
 		mainCamera = Camera.main;
 		cameraMotorDistance = mainCamera.transform.position - gameObject.transform.position;
@@ -121,8 +128,33 @@ public class MotorController : MonoBehaviour {
 		// Reset camera position
 		//mainCamera.transform.position = initPos + cameraMotorDistance;
 
+		// Initialize collider container
+		trailColliders = new List<GameObject>();
+		colliderFactory = gameStateManager.GetColliderFactory();
+		CreateTrailCollider();
+
 		// Init last processed time
 		lastProcessedTime = initLogicTime;
+	}
+
+	private void CreateTrailCollider() {
+		Vector3 colliderPos = transform.TransformPoint(colliderPosOffset);
+		GameObject newTrailCollider = colliderFactory.CreateCollider(colliderPos);
+		trailColliders.Add(newTrailCollider);
+		lastColliderInitPos = newTrailCollider.transform.position;
+		Debug.Log("After adding a new collider, now this player has " + trailColliders.Count + " colliders");
+	}
+
+	private void UpdateLastCollider(Vector3 newColliderPos, float extendsion) {
+		if (trailColliders.Count == 0) {
+			return ;
+		}
+		
+		GameObject trailCollider = trailColliders[trailColliders.Count - 1];
+		if (trailCollider != null) {
+			colliderFactory.UpdateCollider(trailCollider, lastColliderInitPos, 
+			                               newColliderPos, curHorizontalDir, curVerticalDir, extendsion);
+		}
 	}
 
 	public void UpdateDirection(float newHorizontalDir, float newVerticalDir, int newLogicTime, float fixedDeltaTime) {
@@ -138,6 +170,9 @@ public class MotorController : MonoBehaviour {
 			curHorizontalDir = newHorizontalDir;
 			curVerticalDir = 0.0f;
 		}
+
+		// Create a new collider
+		CreateTrailCollider();
 
 		// Update lastProcessedTime
 		lastProcessedTime = newLogicTime;
@@ -164,6 +199,10 @@ public class MotorController : MonoBehaviour {
 
 		// Update Camera Position
 		//mainCamera.transform.position += movement;
+
+		// Update collider
+		Vector3 newColliderPos = transform.TransformPoint(colliderPosOffset);
+		UpdateLastCollider(newColliderPos, movement.magnitude);
 
 		// Update Time
 		lastProcessedTime = newLogicTime;

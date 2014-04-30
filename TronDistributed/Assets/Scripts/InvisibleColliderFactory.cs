@@ -21,7 +21,7 @@ public class InvisibleColliderFactory : MonoBehaviour {
 		if (paused) {
 			return ;
 		}
-		PutCollider();
+		//PutCollider();
 	}
 
 
