@@ -126,7 +126,7 @@ public class GameStateManager : MonoBehaviour {
 		if (networkManager == null) {
 			Debug.Log("Cannot find NetworkManager");
 			// TODO:Show something and then quit
-			Application.LoadLevel(2);
+			Application.LoadLevel(3);
 		}
 		Debug.Log("Get NetworkManager success!");
 		
@@ -135,7 +135,7 @@ public class GameStateManager : MonoBehaviour {
 		if (!networkManager.GetSocketState()) {
 			Debug.Log("Set up connection failed!");
 			// TODO:Show something and then quit
-			Application.LoadLevel(2);
+			Application.LoadLevel(3);
 		}
 		Debug.Log("Set up NetworkManager success!");
 	}
@@ -146,7 +146,7 @@ public class GameStateManager : MonoBehaviour {
 		if (playerManager == null) {
 			Debug.Log("Cannot find PlayerManager");	
 			// TODO:Show something and then quit
-			Application.LoadLevel(2);
+			Application.LoadLevel(3);
 		}
 		playerManager.SetGameStateManager(this);
 		Debug.Log("Get playerManager success");
@@ -158,7 +158,7 @@ public class GameStateManager : MonoBehaviour {
 		if (messageDispatcher == null) {
 			Debug.Log("Cannot find the messageDispatcher");
 			// TODO:Show something and then quit
-			Application.LoadLevel(2);
+			Application.LoadLevel(3);
 		}
 		messageDispatcher.SetGameStateManager(this);
 		Debug.Log("Get MessageDispatcher success");
@@ -170,7 +170,7 @@ public class GameStateManager : MonoBehaviour {
 		if (motorController == null) {
 			Debug.Log("Cannot find the motorController");
 			// TODO:Show something and then quit
-			Application.LoadLevel(2);
+			Application.LoadLevel(3);
 		}
 		motorController.SetGameStateManager(this);
 		Debug.Log("Get motorController success");
@@ -188,7 +188,7 @@ public class GameStateManager : MonoBehaviour {
 		colliderFactory = trail.GetComponent<InvisibleColliderFactory>();
 		if (colliderFactory == null) {
 			Debug.Log("Find InvisibleColliderFactory failed");
-			Application.LoadLevel(2);
+			Application.LoadLevel(3);
 		}
 		Debug.Log("Get InvisibleColliderFactory success!");
 	}
@@ -198,7 +198,7 @@ public class GameStateManager : MonoBehaviour {
 		collisionDetector = gameObject.GetComponent<CollisionDetector>();
 		if (collisionDetector == null) {
 			Debug.Log("Find collision detector failed!");
-			Application.LoadLevel(2);
+			Application.LoadLevel(3);
 		}
 		collisionDetector.SetGameStateManager(this);
 		Debug.Log("Get collision detector success");
