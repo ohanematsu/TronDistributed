@@ -4,15 +4,15 @@ using System.Collections;
 public class PlayHandler : MonoBehaviour {
 
 	void OnMouseEnter() {
-		Debug.Log("Play button enter!");
-		renderer.material.color = Color.red;
-		Debug.Log("Play button enter xxxx!");
+		//Debug.Log("Play button enter!");
+		renderer.material.color = Color.blue;
+		//Debug.Log("Play button enter xxxx!");
 	}
 	
 	void OnMouseExit() {
-		Debug.Log("Play button exit!");
+		//Debug.Log("Play button exit!");
 		renderer.material.color = Color.white;
-		Debug.Log("Play button exit xxxxx!");
+		//Debug.Log("Play button exit xxxxx!");
 	}
 	
 	void OnMouseUp() {
