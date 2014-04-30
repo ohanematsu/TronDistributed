@@ -131,7 +131,7 @@ public class MotorController : MonoBehaviour {
 		// Initialize collider container
 		trailColliders = new List<GameObject>();
 		colliderFactory = gameStateManager.GetColliderFactory();
-		CreateTrailCollider();
+		//CreateTrailCollider();
 
 		// Init last processed time
 		lastProcessedTime = initLogicTime;
@@ -172,7 +172,7 @@ public class MotorController : MonoBehaviour {
 		}
 
 		// Create a new collider
-		CreateTrailCollider();
+		//CreateTrailCollider();
 
 		// Update lastProcessedTime
 		lastProcessedTime = newLogicTime;
@@ -226,7 +226,7 @@ public class MotorController : MonoBehaviour {
 
 		// Update collider
 		Vector3 newColliderPos = transform.TransformPoint(colliderPosOffset);
-		UpdateLastCollider(newColliderPos, movement.magnitude);
+		//UpdateLastCollider(newColliderPos, movement.magnitude);
 
 		// Update Time
 		lastProcessedTime = newLogicTime;

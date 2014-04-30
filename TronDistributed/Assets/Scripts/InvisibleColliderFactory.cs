@@ -42,12 +42,12 @@ public class InvisibleColliderFactory : MonoBehaviour {
 			return ;
 		}
 		//Debug.Log ("Old position x: " + oldPos.x + ", y: " + oldPos.y + ", z: " + oldPos.z);
-		//Debug.Log ("New position x: " + newPos.x + ", y: " + newPos.y + ", z: " + newPos.z);
+		Debug.Log ("New position x: " + newPos.x + ", y: " + newPos.y + ", z: " + newPos.z);
 
 		// Update position (the position should be in the middle of the original position and the new position)
 		trailCollider.transform.position = Vector3.Lerp(initPos, newPos, 0.5f);
 		Vector3 pos = trailCollider.transform.position;
-		//Debug.Log("Update position to [" + pos.x + ", " + pos.y + ", " + pos.z + "]");
+		Debug.Log("Update position to [" + pos.x + ", " + pos.y + ", " + pos.z + "]");
 
 		// Update size
 		BoxCollider collider = trailCollider.GetComponent<BoxCollider>();
