@@ -1,15 +1,15 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Player.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\GameStateManager.cs">
     <Files>
-      <File FileName="Assets\Scripts\GameStateManager.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\InvisibleColliderFactory.cs" Line="45" Column="12" />
-      <File FileName="Assets\Scripts\PlayerManager.cs" Line="35" Column="6" />
+      <File FileName="Assets\Scripts\InvisibleColliderFactory.cs" Line="79" Column="39" />
       <File FileName="Assets\Scripts\CollisionDetector.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\GameStateManager.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\GameStateManager.cs" Line="188" Column="23" />
+      <File FileName="Assets\Scripts\InvisibleColliderFactory.cs" Line="95" Column="1" />
+      <File FileName="Assets\Scripts\PlayerManager.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\MainMenuControl.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\QuitHandler.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\Player.cs" Line="127" Column="12" />
+      <File FileName="Assets\Scripts\Player.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\MotorController.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\MessageDispatcher.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\NetworkManager.cs" Line="1" Column="1" />

@@ -177,8 +177,15 @@ public class GameStateManager : MonoBehaviour {
 	}
 	
 	private void InvisibleColliderFactory() {
+		// Get trail component
+		GameObject trail = transform.GetChild(3).gameObject;
+		if (trail == null) {
+			Debug.Log("Cannot find trail");
+		}
+
 		// Get InvisibleColliderFactory
-		colliderFactory = gameObject.GetComponent<InvisibleColliderFactory>();
+		//colliderFactory = gameObject.GetComponent<InvisibleColliderFactory>();
+		colliderFactory = trail.GetComponent<InvisibleColliderFactory>();
 		if (colliderFactory == null) {
 			Debug.Log("Find InvisibleColliderFactory failed");
 			Application.LoadLevel(2);

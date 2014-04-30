@@ -70,7 +70,7 @@ public class InvisibleColliderFactory : MonoBehaviour {
 
 		GameObject wall = new GameObject("TrailCollider");
 		wall.transform.position = Vector3.Lerp(newWallWorldPos, lastWallWorldPos, 0.5f);
-		//wall.transform.LookAt(newWallWorldPos); // Rotates the transform so the forward vector points at target's current position.
+		wall.transform.LookAt(newWallWorldPos); // Rotates the transform so the forward vector points at target's current position.
 
 		Debug.Log ("Old position x: " + lastWallWorldPos.x + ", y: " + lastWallWorldPos.y + ", z: " + lastWallWorldPos.z);
 		Debug.Log ("New position x: " + newWallWorldPos.x + ", y: " + newWallWorldPos.y + ", z: " + newWallWorldPos.z);
