@@ -153,7 +153,7 @@ public class MotorController : MonoBehaviour {
 		GameObject trailCollider = trailColliders[trailColliders.Count - 1];
 		if (trailCollider != null) {
 			colliderFactory.UpdateCollider(trailCollider, lastColliderInitPos, 
-			                               newColliderPos, curHorizontalDir, curVerticalDir, extendsion);
+				newColliderPos, curHorizontalDir, curVerticalDir, extendsion);
 		}
 	}
 
@@ -193,6 +193,30 @@ public class MotorController : MonoBehaviour {
 		// Move the controller
 		CharacterController controller = GetComponent<CharacterController>();
 		controller.Move(movement);
+
+		// Validate Position
+		if (gameObject.transform.position.x >= 128.5f || gameObject.transform.position.x < 0.0f) {
+			if (gameStateManager.GetNetworkManager().GetSocketState()) {
+				Dictionary<string, object> message = new Dictionary<string, object>();
+				message["type"] = MessageDispatcher.DELETE_USER;
+				message["userID"] = gameStateManager.GetUserID();
+				gameStateManager.GetNetworkManager().writeSocket(message);
+				gameStateManager.GetNetworkManager().closeSocket();
+				Debug.Log("Run out of map! Quit");
+				Application.LoadLevel(3);
+			}
+		}
+		if (gameObject.transform.position.z >= 128.5f || gameObject.transform.position.z < 0.0f) {
+			if (gameStateManager.GetNetworkManager().GetSocketState()) {
+				Dictionary<string, object> message = new Dictionary<string, object>();
+				message["type"] = MessageDispatcher.DELETE_USER;
+				message["userID"] = gameStateManager.GetUserID();
+				gameStateManager.GetNetworkManager().writeSocket(message);
+				gameStateManager.GetNetworkManager().closeSocket();
+				Debug.Log("Run out of map! Quit");
+				Application.LoadLevel(3);
+			}
+		}
 		
 		// Set rotation to the move direction
 		transform.rotation = Quaternion.LookRotation(moveDirection);

@@ -46,7 +46,6 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Assets_By_Unluck_Activeden\scripts\MouseLook.cs" />
      <Compile Include="Assets\Scripts\CollisionDetector.cs" />
      <Compile Include="Assets\Scripts\EscapeMenuControl.cs" />
      <Compile Include="Assets\Scripts\FrameRateManager.cs" />
