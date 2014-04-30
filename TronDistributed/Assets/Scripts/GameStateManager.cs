@@ -8,7 +8,7 @@ public class GameStateManager : MonoBehaviour {
 	private PlayerManager playerManager;
 	private MessageDispatcher messageDispatcher;
 	private MotorController motorController;
-	private InvisibleBoxLocator colliderMaker;
+	private InvisibleColliderFactory colliderFactory;
 	private CollisionDetector collisionDetector;
 
 	private int curLogicTime;
@@ -32,7 +32,7 @@ public class GameStateManager : MonoBehaviour {
 		InitPlayerManager();
 		InitMessageDispatcher();
 		InitMotorController();
-		InitColliderMaker();
+		InvisibleColliderFactory();
 		InitCollisionDetector();
 
 		// Initiate global values
@@ -176,7 +176,7 @@ public class GameStateManager : MonoBehaviour {
 		Debug.Log("Get motorController success");
 	}
 	
-	private void InitColliderMaker() {
+	private void InvisibleColliderFactory() {
 		// Get InvisibleBoxLocator
 		Transform trailTransform = transform.GetChild(transform.childCount - 1);
 		if (trailTransform == null) {
@@ -185,8 +185,8 @@ public class GameStateManager : MonoBehaviour {
 		}
 		Debug.Log("Get trail transform success!");
 
-		colliderMaker = trailTransform.gameObject.GetComponent<InvisibleBoxLocator>();
-		if (colliderMaker == null) {
+		colliderFactory = trailTransform.gameObject.GetComponent<InvisibleColliderFactory>();
+		if (colliderFactory == null) {
 			Debug.Log("Find colliderMaker failed");
 			Application.LoadLevel(2);
 		}
@@ -245,7 +245,7 @@ public class GameStateManager : MonoBehaviour {
 	public void SetPauseState(bool state) {
 		paused = state;
 		playerManager.setPauseState(state);
-		colliderMaker.SetPauseState(state);
+		colliderFactory.SetPauseState(state);
 	}
 
 	public NetworkManager GetNetworkManager() {
