@@ -177,20 +177,13 @@ public class GameStateManager : MonoBehaviour {
 	}
 	
 	private void InvisibleColliderFactory() {
-		// Get InvisibleBoxLocator
-		Transform trailTransform = transform.GetChild(transform.childCount - 1);
-		if (trailTransform == null) {
-			Debug.Log("Find trail transform failed!");
-			Application.LoadLevel(2);
-		}
-		Debug.Log("Get trail transform success!");
-
-		colliderFactory = trailTransform.gameObject.GetComponent<InvisibleColliderFactory>();
+		// Get InvisibleColliderFactory
+		colliderFactory = gameObject.GetComponent<InvisibleColliderFactory>();
 		if (colliderFactory == null) {
-			Debug.Log("Find colliderMaker failed");
+			Debug.Log("Find InvisibleColliderFactory failed");
 			Application.LoadLevel(2);
 		}
-		Debug.Log("Get colider maker success!");
+		Debug.Log("Get InvisibleColliderFactory success!");
 	}
 
 	private void InitCollisionDetector() {
