@@ -100,7 +100,7 @@ public class MessageDispatcher : MonoBehaviour {
 		addUserMessage.Add("userID", userID);
 		addUserMessage.Add("posX", startPos.x);
 		addUserMessage.Add("posY", startPos.y);
-		addUserMessage.Add("posZ", startPos.x);
+		addUserMessage.Add("posZ", startPos.z);
 		addUserMessage.Add("horizontalDir", h);
 		addUserMessage.Add("verticalDir", v);
 		addUserMessage.Add("time", gameStateManager.GetCurLogicTime());

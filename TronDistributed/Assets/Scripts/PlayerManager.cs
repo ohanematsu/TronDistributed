@@ -120,8 +120,9 @@ public class PlayerManager : MonoBehaviour{
 			InitRemotePlayer(userID, message);
 		}
 
+		/*
 		List<Dictionary<string, object>> messageList = new List<Dictionary<string, object>>();
-		knownPlayerUnProcessedMsgList.Add(userID, messageList);
+		knownPlayerUnProcessedMsgList.Add(userID, messageList);*/
 	}
 	
 	private void InitLocalPlayer(Dictionary<string, object> message) {

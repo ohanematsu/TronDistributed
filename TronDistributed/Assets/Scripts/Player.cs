@@ -22,6 +22,7 @@ public class Player {
 	private InvisibleColliderFactory colliderFactory;
 
 	private Vector3 colliderPosOffset;
+	private Vector3 lastColliderInitPos;
 
 	public void SetStartState(GameObject prefab, float speed, Dictionary<string, object> addUserMessage,
 	                          InvisibleColliderFactory invisibleColliderFactory) {
@@ -68,7 +69,6 @@ public class Player {
 
 		// Update player's position
 		Vector3 oldPos = motor.transform.position;
-		Vector3 oldColliderPos = motor.transform.TransformPoint(colliderPosOffset);
 		motor.transform.position = oldPos + movement;
 		Vector3 newColliderPos = motor.transform.TransformPoint(colliderPosOffset);
 
@@ -77,7 +77,7 @@ public class Player {
 
 		// Create invisible colliders in trail
 		//CreateTrailCollider(oldPos);
-		UpdateLastCollider(oldColliderPos, newColliderPos);
+		UpdateLastCollider(newColliderPos, movement.magnitude);
 
 		// Update last processed time
 		lastProcessedLogicTime = newLogicTime;
@@ -118,18 +118,15 @@ public class Player {
 		return processedMessage;
 	}
 
-	private void UpdateLastCollider(Vector3 oldColliderPos, Vector3 newColliderPos) {
-		if (oldColliderPos == newColliderPos) {
-			return ;
-		}
-
+	private void UpdateLastCollider(Vector3 newColliderPos, float extendsion) {
 		if (trailColliders.Count == 0) {
 			return ;
 		}
 
 		GameObject trailCollider = trailColliders[trailColliders.Count - 1];
 		if (trailCollider != null) {
-			colliderFactory.UpdateCollider(trailCollider, oldColliderPos, newColliderPos, curHorizontalDir, curVerticalDir);
+			colliderFactory.UpdateCollider(trailCollider, lastColliderInitPos, 
+				newColliderPos, curHorizontalDir, curVerticalDir, extendsion);
 		}
 	}
 
@@ -137,6 +134,7 @@ public class Player {
 		Vector3 colliderPos = motor.transform.TransformPoint(colliderPosOffset);
 		GameObject newTrailCollider = colliderFactory.CreateCollider(colliderPos);
 		trailColliders.Add(newTrailCollider);
+		lastColliderInitPos = newTrailCollider.transform.position;
 		Debug.Log("After adding a new collider, now this player has " + trailColliders.Count + " colliders");
 	}
 

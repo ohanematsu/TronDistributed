@@ -13,7 +13,7 @@ public class InvisibleColliderFactory : MonoBehaviour {
 		offset = new Vector3(0, 0, -2.0f);
 		lastWallWorldPos = transform.TransformPoint(gameObject.transform.localPosition + offset);
 		paused = true;
-		defaultSize = new Vector3(0.1f, 4.0f, 0.1f);
+		defaultSize = new Vector3(0.1f, 5.0f, 0.1f);
 	}
 	
 	// Update is called once per frame
@@ -27,20 +27,27 @@ public class InvisibleColliderFactory : MonoBehaviour {
 
 	public GameObject CreateCollider(Vector3 pos) {
 		GameObject collider = new GameObject("TrailCollider");
-		collider.transform.position = gameObject.transform.position;
+		Debug.Log("Create a new collider, pos[" + pos.x + ", " + pos.y + ", " + pos.z + "]");
+		//collider.transform.position = gameObject.transform.position;
+		collider.transform.position = pos;
 		BoxCollider boxCollider = collider.AddComponent<BoxCollider>();
 		boxCollider.size = defaultSize;
 		return collider;
 	}
 
-	public void UpdateCollider(GameObject trailCollider, Vector3 oldPos, Vector3 newPos,
-	                           float horizontalDir, float verticalDir) {
+	public void UpdateCollider(GameObject trailCollider, Vector3 initPos, Vector3 newPos,
+	                           float horizontalDir, float verticalDir, float extension) {
+		Vector3 oldPos = trailCollider.transform.position; 
 		if (newPos == oldPos) {
 			return ;
 		}
+		//Debug.Log ("Old position x: " + oldPos.x + ", y: " + oldPos.y + ", z: " + oldPos.z);
+		Debug.Log ("New position x: " + newPos.x + ", y: " + newPos.y + ", z: " + newPos.z);
 
 		// Update position (the position should be in the middle of the original position and the new position)
-		trailCollider.transform.position = Vector3.Lerp(oldPos, newPos, 0.5f);
+		trailCollider.transform.position = Vector3.Lerp(initPos, newPos, 0.5f);
+		Vector3 pos = trailCollider.transform.position;
+		Debug.Log("Update position to [" + pos.x + ", " + pos.y + ", " + pos.z + "]");
 
 		// Update size
 		BoxCollider collider = trailCollider.GetComponent<BoxCollider>();
@@ -49,9 +56,9 @@ public class InvisibleColliderFactory : MonoBehaviour {
 			return ;
 		}
 		if (horizontalDir != 0.0f) {
-			collider.size += new Vector3(Vector3.Distance(newPos, oldPos), 0.0f, 0.0f);
+			collider.size += new Vector3(extension, 0.0f, 0.0f);
 		} else if (verticalDir != 0.0f) {
-			collider.size += new Vector3(0.0f, 0.0f, Vector3.Distance(newPos, oldPos));
+			collider.size += new Vector3(0.0f, 0.0f, extension);
 		} else {
 			Debug.Log("No direction button is pressed. Won't update collider size");
 		}
@@ -72,8 +79,8 @@ public class InvisibleColliderFactory : MonoBehaviour {
 		wall.transform.position = Vector3.Lerp(newWallWorldPos, lastWallWorldPos, 0.5f);
 		wall.transform.LookAt(newWallWorldPos); // Rotates the transform so the forward vector points at target's current position.
 
-		Debug.Log ("Old position x: " + lastWallWorldPos.x + ", y: " + lastWallWorldPos.y + ", z: " + lastWallWorldPos.z);
-		Debug.Log ("New position x: " + newWallWorldPos.x + ", y: " + newWallWorldPos.y + ", z: " + newWallWorldPos.z);
+		//Debug.Log ("Old position x: " + lastWallWorldPos.x + ", y: " + lastWallWorldPos.y + ", z: " + lastWallWorldPos.z);
+		//Debug.Log ("New position x: " + newWallWorldPos.x + ", y: " + newWallWorldPos.y + ", z: " + newWallWorldPos.z);
 
 		BoxCollider boxCollider = wall.AddComponent("BoxCollider") as BoxCollider;
 		if (newWallWorldPos.x == lastWallWorldPos.x) { // If motor don't change its horizontal direction
