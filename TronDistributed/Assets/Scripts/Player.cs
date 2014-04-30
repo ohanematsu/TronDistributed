@@ -102,12 +102,8 @@ public class Player {
 		// Update last processed time
 		lastProcessedLogicTime = newLogicTime;
 
-		/*
-		if (msgTimeStamp > lastProcessedLogicTime) {
-			lastProcessedLogicTime = msgTimeStamp;
-		} else {
-			Debug.Log("Timestamp of UPDATE message is less than current time, only update direction");
-		}*/
+		// Create a new collider
+		CreateTrailCollider();
 	}
 
 	public int GetLastProcessedTime() {
