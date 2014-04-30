@@ -21,9 +21,13 @@ public class Player {
 
 	private InvisibleColliderFactory colliderFactory;
 
-	public void SetStartState(GameObject prefab, float speed, Dictionary<string, object> addUserMessage) {
+	public void SetStartState(GameObject prefab, float speed, Dictionary<string, object> addUserMessage,
+	                          InvisibleColliderFactory invisibleColliderFactory) {
 		motor = prefab;
 		moveSpeed = speed;
+
+		colliderFactory = invisibleColliderFactory;
+
 		lastProcessedLogicTime = Convert.ToInt32(addUserMessage["time"]);
 
 		// Initilize position
@@ -45,6 +49,8 @@ public class Player {
 
 		processedMessage = new List<Dictionary<string, object>>();
 		processedMessage.Add(addUserMessage);
+
+		CreateTrailCollider();
 	}
 	
 	public void UpdateBasedOnPrediction(int newLogicTime, float fixedDeltaTime) {
@@ -64,7 +70,8 @@ public class Player {
 		motor.transform.rotation = Quaternion.LookRotation(moveDirection);
 
 		// Create invisible colliders in trail
-		CreateTrailCollider(oldPos);
+		//CreateTrailCollider(oldPos);
+		UpdateLastCollider(oldPos, motor.transform.position);
 
 		// Update last processed time
 		lastProcessedLogicTime = newLogicTime;
@@ -120,6 +127,12 @@ public class Player {
 		}
 	}
 
+	private void CreateTrailCollider() {
+		GameObject newTrailCollider = colliderFactory.CreateCollider(motor.transform.position);
+		trailColliders.Add(newTrailCollider);
+	}
+
+	/*
 	private void CreateTrailCollider(Vector3 oldPos) {
 		GameObject trailCollider = new GameObject("TrailCollider");
 		Vector3 newPos = motor.transform.position;
@@ -140,7 +153,7 @@ public class Player {
 		}
 
 		trailColliders.Add(trailCollider);
-	}
+	}*/
 
 	public List<GameObject> GetAllColliders() {
 		return trailColliders;

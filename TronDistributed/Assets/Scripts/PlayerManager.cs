@@ -144,7 +144,7 @@ public class PlayerManager : MonoBehaviour{
 
 		// Instantiate prefabs
 		Player newPlayer = new Player();
-		newPlayer.SetStartState(new GameObject(), otherPlayerSpeed, message);
+		newPlayer.SetStartState(new GameObject(), otherPlayerSpeed, message, gameStateManager.GetColliderFactory());
 		Players.Add(gameStateManager.GetUserID(), newPlayer);
 		Debug.Log("Init local user complete");
 
@@ -175,7 +175,7 @@ public class PlayerManager : MonoBehaviour{
 		
 		// Create player
 		Player newPlayer = new Player();
-		newPlayer.SetStartState(playerPrefab, gameStateManager.GetMoveSpeed(), message);
+		newPlayer.SetStartState(playerPrefab, gameStateManager.GetMoveSpeed(), message, gameStateManager.GetColliderFactory());
 		Players.Add(userID, newPlayer);
 		Debug.Log("Initate player " + userID + " complete");
 	}

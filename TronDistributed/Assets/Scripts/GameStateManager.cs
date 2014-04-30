@@ -256,6 +256,10 @@ public class GameStateManager : MonoBehaviour {
 	public MotorController GetMotorController() {
 		return motorController;
 	}
+
+	public InvisibleColliderFactory GetColliderFactory() {
+		return colliderFactory;
+	}
 	
 	public int GetCurLogicTime() {
 		return curLogicTime;
