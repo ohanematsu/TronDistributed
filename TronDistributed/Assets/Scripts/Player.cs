@@ -130,6 +130,7 @@ public class Player {
 	private void CreateTrailCollider() {
 		GameObject newTrailCollider = colliderFactory.CreateCollider(motor.transform.position);
 		trailColliders.Add(newTrailCollider);
+		Debug.Log("After adding a new collider, now this player has " + trailColliders.Count + " colliders");
 	}
 
 	/*
