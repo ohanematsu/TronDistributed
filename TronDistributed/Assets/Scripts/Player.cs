@@ -19,6 +19,8 @@ public class Player {
 	private List<GameObject> trailColliders;
 	private List<Dictionary<string, object>> processedMessage;
 
+	private InvisibleColliderFactory colliderFactory;
+
 	public void SetStartState(GameObject prefab, float speed, Dictionary<string, object> addUserMessage) {
 		motor = prefab;
 		moveSpeed = speed;
@@ -101,6 +103,21 @@ public class Player {
 
 	public List<Dictionary<string, object>> GetProcessedMessage() {
 		return processedMessage;
+	}
+
+	private void UpdateLastCollider(Vector3 oldPos, Vector3 newPos) {
+		if (oldPos == newPos) {
+			return ;
+		}
+
+		if (trailColliders.Count == 0) {
+			return ;
+		}
+
+		GameObject trailCollider = trailColliders[trailColliders.Count - 1];
+		if (trailCollider != null) {
+			colliderFactory.UpdateCollider(trailCollider, oldPos, newPos, curHorizontalDir, curVerticalDir);
+		}
 	}
 
 	private void CreateTrailCollider(Vector3 oldPos) {

@@ -11,7 +11,7 @@ public class InvisibleColliderFactory : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		offset = new Vector3(0, 0, -2.0f);
-		//lastWallWorldPos = transform.TransformPoint(gameObject.transform.localPosition + offset);
+		lastWallWorldPos = transform.TransformPoint(gameObject.transform.localPosition + offset);
 		paused = true;
 		defaultSize = new Vector3(0.1f, 4.0f, 0.1f);
 	}
@@ -25,16 +25,11 @@ public class InvisibleColliderFactory : MonoBehaviour {
 	}
 
 
-	public GameObject CreateCollider(Vector3 pos, float horizontalDir, float verticalDir) {
-		if (horizontalDir == 0.0f && verticalDir == 0.0f) {
-			return null;
-		}
-
+	public GameObject CreateCollider(Vector3 pos) {
 		GameObject collider = new GameObject("TrailCollider");
 		collider.transform.position = gameObject.transform.position;
 		BoxCollider boxCollider = collider.AddComponent<BoxCollider>();
 		boxCollider.size = defaultSize;
-
 		return collider;
 	}
 
@@ -92,8 +87,8 @@ public class InvisibleColliderFactory : MonoBehaviour {
 
 	public void SetPauseState(bool state) {
 		paused = state;
-		if (state) {
+		/*if (state) {
 			lastWallWorldPos = transform.TransformPoint(gameObject.transform.localPosition + offset);
-		}
+		}*/
 	}
 }
