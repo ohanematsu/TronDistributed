@@ -53,7 +53,7 @@ public class Player {
 		processedMessage = new List<Dictionary<string, object>>();
 		processedMessage.Add(addUserMessage);
 
-		colliderPosOffset = new Vector3(0, 0, -2.0f);
+		colliderPosOffset = new Vector3(0, 0, -0.5f);
 
 		CreateTrailCollider();
 	}
@@ -95,6 +95,8 @@ public class Player {
 		// Update player's direction
 		curHorizontalDir = newHorizontalDir;
 		curVerticalDir = newVerticalDir;
+		Vector3 moveDirection = new Vector3(curHorizontalDir, 0, curVerticalDir);
+		motor.transform.rotation = Quaternion.LookRotation(moveDirection);
 
 		// Store message
 		processedMessage.Add(message);

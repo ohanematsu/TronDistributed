@@ -104,7 +104,7 @@ public class MotorController : MonoBehaviour {
 			Debug.Log("No run animation found. Turning off animations.");
 		}
 
-		colliderPosOffset = new Vector3(0, 0, -2.0f);
+		colliderPosOffset = new Vector3(0, 0, -0.5f);
 
 		// Calculate the distance between camera and player
 		mainCamera = Camera.main;
@@ -131,7 +131,7 @@ public class MotorController : MonoBehaviour {
 		// Initialize collider container
 		trailColliders = new List<GameObject>();
 		colliderFactory = gameStateManager.GetColliderFactory();
-		//CreateTrailCollider();
+		CreateTrailCollider();
 
 		// Init last processed time
 		lastProcessedTime = initLogicTime;
@@ -171,8 +171,11 @@ public class MotorController : MonoBehaviour {
 			curVerticalDir = 0.0f;
 		}
 
+		Vector3 moveDirection = new Vector3(curHorizontalDir, 0, curVerticalDir);
+		transform.rotation = Quaternion.LookRotation(moveDirection);
+
 		// Create a new collider
-		//CreateTrailCollider();
+		CreateTrailCollider();
 
 		// Update lastProcessedTime
 		lastProcessedTime = newLogicTime;
@@ -226,7 +229,7 @@ public class MotorController : MonoBehaviour {
 
 		// Update collider
 		Vector3 newColliderPos = transform.TransformPoint(colliderPosOffset);
-		//UpdateLastCollider(newColliderPos, movement.magnitude);
+		UpdateLastCollider(newColliderPos, movement.magnitude);
 
 		// Update Time
 		lastProcessedTime = newLogicTime;

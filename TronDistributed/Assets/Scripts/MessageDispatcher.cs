@@ -67,10 +67,10 @@ public class MessageDispatcher : MonoBehaviour {
 		// Generate the initial position and direction
 
 		/* For test*/
-		Vector3 startPos = new Vector3(initX, 1.1f, 10.0f);
+		Vector3 startPos = new Vector3(initX, 1.1f, initX);
 		float h, v;
-		h = 0.0f;
-		v = 1.0f;
+		h = 1.0f;
+		v = 0.0f;
 		initX += 10.0f;
 
 		//Vector3 startPos = new Vector3(UnityEngine.Random.Range(1.0f, 63.0f), 1.1f, UnityEngine.Random.Range(1.0f, 63.0f));
