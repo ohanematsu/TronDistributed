@@ -5,7 +5,7 @@ public class PlayHandler : MonoBehaviour {
 
 	void OnMouseEnter() {
 		//Debug.Log("Play button enter!");
-		renderer.material.color = Color.blue;
+		renderer.material.color = Color.red;
 		//Debug.Log("Play button enter xxxx!");
 	}
 	

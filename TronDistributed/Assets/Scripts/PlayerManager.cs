@@ -252,6 +252,12 @@ public class PlayerManager : MonoBehaviour{
 	}
 
 	private void DestroyPlayers(string userID) {
+		Debug.Log("Prepare to delete player");
+		if (!Players.ContainsKey(userID)) {
+			Debug.Log("Player " + userID + "doesn't exsit");
+			return ;
+		}
+
 		// Delete player
 		List<GameObject> trailColliders = Players[userID].GetAllColliders();
 		foreach (GameObject collider in trailColliders) {

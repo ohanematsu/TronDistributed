@@ -5,7 +5,7 @@ public class QuitHandler : MonoBehaviour {
 
 	void OnMouseEnter() {
 		//Debug.Log("Quit button enter!");
-		renderer.material.color = Color.blue;
+		renderer.material.color = Color.red;
 		//Debug.Log("Quit button enter xxxxx!");
 	}
 	

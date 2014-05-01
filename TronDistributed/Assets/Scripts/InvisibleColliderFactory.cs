@@ -13,7 +13,7 @@ public class InvisibleColliderFactory : MonoBehaviour {
 		offset = new Vector3(0, 0, -5.0f);
 		lastWallWorldPos = transform.TransformPoint(gameObject.transform.localPosition + offset);
 		paused = true;
-		defaultSize = new Vector3(0.1f, 5.0f, 0.1f);
+		defaultSize = new Vector3(0.2f, 5.0f, 0.2f);
 	}
 	
 	// Update is called once per frame
@@ -32,7 +32,7 @@ public class InvisibleColliderFactory : MonoBehaviour {
 		collider.transform.position = pos;
 		BoxCollider boxCollider = collider.AddComponent<BoxCollider>();
 		boxCollider.size = defaultSize;
-		collider.transform.LookAt(pos);
+		//collider.transform.LookAt(pos);
 		return collider;
 	}
 
@@ -43,14 +43,11 @@ public class InvisibleColliderFactory : MonoBehaviour {
 			return ;
 		}
 		//Debug.Log ("Old position x: " + oldPos.x + ", y: " + oldPos.y + ", z: " + oldPos.z);
-		Debug.Log ("New position x: " + newPos.x + ", y: " + newPos.y + ", z: " + newPos.z);
+		//Debug.Log ("New position x: " + newPos.x + ", y: " + newPos.y + ", z: " + newPos.z);
 
 		// Update position (the position should be in the middle of the original position and the new position)
 		trailCollider.transform.position = Vector3.Lerp(initPos, newPos, 0.5f);
-		trailCollider.transform.LookAt(trailCollider.transform.position);
-		Vector3 pos = trailCollider.transform.position;
-		Debug.Log("Update position to [" + pos.x + ", " + pos.y + ", " + pos.z + "]");
-		//trailCollider.transform.lossyScale = 
+		//trailCollider.transform.LookAt(trailCollider.transform.position);
 
 		// Update size
 		BoxCollider collider = trailCollider.GetComponent<BoxCollider>();
@@ -59,11 +56,9 @@ public class InvisibleColliderFactory : MonoBehaviour {
 			return ;
 		}
 		if (horizontalDir != 0.0f) {
-			//collider.size += new Vector3(extension, 0.0f, 0.0f);
-			trailCollider.transform.localScale += new Vector3(extension, 0.0f, 0.0f);
+			collider.size += new Vector3(extension, 0.0f, 0.0f);
 		} else if (verticalDir != 0.0f) {
-			//collider.size += new Vector3(0.0f, 0.0f, extension);
-			trailCollider.transform.localScale += new Vector3(0.0f, 0.0f, extension);
+			collider.size += new Vector3(0.0f, 0.0f, extension);
 		} else {
 			Debug.Log("No direction button is pressed. Won't update collider size");
 		}

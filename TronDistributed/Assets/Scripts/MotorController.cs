@@ -126,7 +126,7 @@ public class MotorController : MonoBehaviour {
 		transform.rotation = Quaternion.LookRotation(moveDirection);
 
 		// Reset camera position
-		//mainCamera.transform.position = initPos + cameraMotorDistance;
+		mainCamera.transform.position = initPos + cameraMotorDistance;
 
 		// Initialize collider container
 		trailColliders = new List<GameObject>();
@@ -225,7 +225,7 @@ public class MotorController : MonoBehaviour {
 		transform.rotation = Quaternion.LookRotation(moveDirection);
 
 		// Update Camera Position
-		//mainCamera.transform.position += movement;
+		mainCamera.transform.position += movement;
 
 		// Update collider
 		Vector3 newColliderPos = transform.TransformPoint(colliderPosOffset);
